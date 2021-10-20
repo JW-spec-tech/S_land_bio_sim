@@ -144,4 +144,4 @@ S_land_bio_sim <- function(n,x,y,res,auto,var,nug,mean){
 }
 
 
-biomass <- S_land_bio_sim(25,1000,1000,1,50,5,0.2,0.5)
+biomass <- S_land_bio_sim(25,100,100,1,50,5,0.2,0.5)
