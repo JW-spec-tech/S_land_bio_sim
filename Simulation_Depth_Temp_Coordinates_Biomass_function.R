@@ -1,6 +1,6 @@
-S_land_bio_sim <- function(n,x,y,res,auto,var,nug,mean){
-  # x=100
-  # y=100
+S_land_bio_sim <- function(n,x,y,auto,var,nug,mean){
+
+  
   #### 1. Load Packages ####
   # Package names
   packages <- c("NLMR", "mgcv", "plyr", "dplyr", "raster","landscapetools","devtools","openxlsx","arrow")
@@ -21,25 +21,42 @@ S_land_bio_sim <- function(n,x,y,res,auto,var,nug,mean){
   
   Main_L <- nlm_gaussianfield(x,
                               y,
-                              resolution = res,
+                              resolution = 1,
                               autocorr_range = auto,
                               mag_var = var,
                               nug = nug,
                               mean = mean)
   
-  
+  message("Main_landscape_generation")
   #### 2.B Generate secondary landscapes which will be used to vary temperature.####
-  Sub_L <- list()
-  for(i in 1:n){
-    Sub_L[[i]] <- nlm_gaussianfield(x,
-                                    y,
-                                    resolution = 10,
-                                    autocorr_range = 1,
-                                    mag_var = 5,
-                                    nug = 0.2,
-                                    mean = 0.5)
-  }
+  # Sub_L <- list()
+  # for(i in 1:n){
+  #   
+  #   
+  #   Sub_L[[i]] <- nlm_gaussianfield(x,
+  #                                   y,
+                                    # resolution = 10,
+                                    # autocorr_range = 1,
+                                    # mag_var = 5,
+                                    # nug = 0.2,
+                                    # mean = 0.5)
+  # }
+  # 
+  # x <- 1000
+  # y <- 1000
   
+  list_x <- rep(x, n)
+  list_y <- rep(y, n)
+  
+  Sub_L <- mapply(FUN = nlm_gaussianfield,
+                   ncol = list_x, nrow = list_y, 
+                  resolution = 1,
+                  autocorr_range = 1,
+                  mag_var = 5,
+                  nug = 0.2,
+                  mean = 0.5)
+  
+  message("2.B Generate secondary landscapes which will be used to vary temperature.")
   #### 2.C Generate secondary depths which will be used to generate alternate temperatures for the different years ####
   Sub_L_M <- list()
   for(i in 1:n){
@@ -50,13 +67,15 @@ S_land_bio_sim <- function(n,x,y,res,auto,var,nug,mean){
   # for(i in 1:20){
   #   show_landscape(Sub_L_M[[i]])
   # }
+  
+  message("2.C Generate secondary depths which will be used to generate alternate temperatures for the different years")
   #### 3. Generate Main Depth and temporary sub depths ####
   Main_L_copy <- Main_L #make a copy
   Main_L_copy@data@values <- (Main_L_copy@data@values*1126)+58 #make depth
   landscapetools::show_landscape(Main_L_copy) # visualize main ladnscape
   value <- Main_L_copy@data@values # get main landscape depths
   
-  
+  writeRaster(Main_L_copy,"main_L",overwrite=TRUE)
   # Make sub landscapes depths
   for(i in 1:n){
     Sub_L_M[[i]]@data@values <- (Sub_L_M[[i]]@data@values*1126)+58
@@ -66,6 +85,7 @@ S_land_bio_sim <- function(n,x,y,res,auto,var,nug,mean){
   # for(i in 1:n){
   # landscapetools::show_landscape(Sub_L_M[[i]])
   # }
+  message("3. Generate Main Depth and temporary sub depths")
   
   #### 4. Generate temperature ####
   
@@ -107,41 +127,86 @@ S_land_bio_sim <- function(n,x,y,res,auto,var,nug,mean){
     d=get(i)
     temps_sub[[i]] <- predict(gam_depth_sim, newdata = d[1] , se.fit = T)
   }
+  message("4. Generate temperature")
   
   #### 5. Generate Biomass ####
   
   # mean_biomass = dnorm(depth - depth_opt, 0, 100)/dnorm(0,0,100)*dnorm(temp - temp_opt, 0, 2)/dnorm(0,0,2)
-  biomass_mean_sub <<- data.frame(matrix(nrow=nrow(s_depth_DF1),ncol=n))
+
+  biomass_mean_sub <- data.frame(matrix(nrow=nrow(s_depth_DF1),ncol=n))
   
-  for (i in 1:nrow(s_depth_DF1)){
-    for (j in 1:n){
-      k=paste0("s_depth_DF",j)
-      biomass_mean_sub[i,j] <- dnorm(((Sub_L_M[[j]]@data@values[i]) - 312.5), 0, 100)/dnorm(0,0,100)*dnorm(((temps_sub[[k]][["fit"]][[i]]) - 2.916), 0, 2)/dnorm(0,0,2)
-    }}
+  # for (i in 1:nrow(s_depth_DF1)){
+  #   for (j in 1:n){
+  #     k=paste0("s_depth_DF",j)
+  #     biomass_mean_sub[i,j] <- dnorm(((Sub_L_M[[j]]@data@values[i]) - 312.5), 0, 100)/dnorm(0,0,100)*dnorm(((temps_sub[[k]][["fit"]][[i]]) - 2.916), 0, 2)/dnorm(0,0,2)
+  #   }}
+  
+  scale_100 <-dnorm(0,0,100)
+  scale_2<- dnorm(0,0,2)
+  for (j in 1:n){
+    k=paste0("s_depth_DF",j)
+    biomass_mean_sub[,j] <- (dnorm(((Sub_L_M[[j]]@data@values) - 312.5), 0, 100)/scale_100 *dnorm(((temps_sub[[k]][["fit"]]) - 2.916), 0, 2)/scale_2) 
+  }
+  
   biomass_mean_sub
-  #### 6. Assemble and store the data ####
+  
+  message("5. Generate Biomass")
+  
+  #### 6. Add Variation in shrimp biomass
+  
+  # Generate a landscape for variation
+  biomass_variation <- nlm_gaussianfield(x,
+                                         y,
+                                         resolution = 1,
+                                         autocorr_range = 50,
+                                         mag_var = 5,
+                                         nug = 0.2,
+                                         mean = 0.5)
+  
+  # Multiply the landscape with mean biomass at every location
+  for (i in 1:n) {
+    biomass_mean_sub[,i] <- exp(biomass_variation@data@values)*biomass_mean_sub[,i]
+    
+  }
+   
+  message("6. Add Variation in shrimp biomass")
+  #### 7. Generate stratums
+  patches_list <- make_patches(patch=Main_L_copy)
+  
+  
+  # Stack the rasters and turn into df values (alignment  )
+  the_stack <- stack(Main_L_copy, patches_list$patches_raster)
+  names(the_stack) <- c("Main", "Patches")
+  
+  message("6. Generate stratums")
+  
+  #### 8. Assemble and store the data ####
   
   #Get all the necessary data into a single list
   sim<-list()
+  stratum = values(patches_list$patches_raster)
   for (i in 1:n) {
     k=paste0("s_depth_DF",i)
-      depth   = Sub_L_M[[i]]@data@values
-      temp    = temps_sub[[k]][["fit"]]
-      coord   = coordinates(Main_L)
-      biomass = biomass_mean_sub[,i]
-      name <- paste('item:',i,sep='')
-      tmp <- list(depth=depth, temp=temp, coord=coord, biomass=biomass)
-      sim[[name]] <- as.data.frame(tmp)
+    depth   = value  # get froim Main_L_COPY
+    temp    = temps_sub[[k]][["fit"]]
+    coord   = coordinates(Main_L)
+    biomass = rTweedie(biomass_mean_sub[,i], p = 1.76, phi= 2)
+      #### NEEDS PATCH_RASTER CODE ABOVE ####
+    name <- paste('item:',i,sep='')
+    tmp <- list(depth=depth, temp=temp, coord=coord, biomass=biomass,stratum=stratum)
+    sim[[name]] <- as.data.frame(tmp)
   }
   
   #write the files individually
+  dir.create("sim")
   for (i in 1:n) {
     k=paste0("item:",i)
-    write_parquet(sim[[k]],paste0("sim",i))
+    write_parquet(sim[[k]],paste0("sim/sim",i))
   }
-
-  
+  message("7. Assemble and store the data")
+  return(list(the_stack=the_stack,patches_list=patches_list))
 }
 
 
-biomass <- S_land_bio_sim(25,100,100,1,50,5,0.2,0.5)
+
+
