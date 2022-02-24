@@ -1,4 +1,6 @@
 make_patches <- function(patch){ #,plot=F
+   
+  # patch <- raster("main_L.gri")
   
   Main_L_copy <- patch
 
@@ -62,7 +64,7 @@ Main_L_copy_rcl_clumped_sf <- Main_L_copy_rcl_clumped_sf %>%
 
 # using sspm to tesselate
 sspm_boundary <- spm_as_boundary(boundaries = Main_L_copy_rcl_clumped_sf, 
-                                 boundary_column = "bound_id")
+                                 boundary = "bound_id")
 
 # This makes sure we sample the surface of the polygons at random points 
 # 10 points per polygon

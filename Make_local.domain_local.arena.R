@@ -8,7 +8,7 @@ Make_patch_domain_arena_DAT <- function(patches,the_stack){
   
   # using sspm to tesselate
   sspm_boundary_areas <- spm_as_boundary(boundaries = patches_area, 
-                                         boundary_column = "bound_id")
+                                         boundary = "bound_id")
   # plot(sspm_boundary_areas)
   
   # This makes sure we sample the surface of the polygons at random points 
