@@ -55,15 +55,20 @@ ogmap_estimates <- readr::read_table("biomass__Ogmap2 - Demo.log", skip = 2)
 #   dplyr::summarise(tfit_simple_gam=sum(fit_simple_gam)/1000,tfit_spatialonly_gam=sum(fit_spatialonly_gam)/1000)
 
 
-
+# in kg
 comparison <- data.frame(dat_grid_pred,
-                         ogmap=(as.numeric(ogmap_estimates$Estimate[1:6])*1000), 
-                         CI_upper_ogmap= ogmap_estimates$UpCIval[1:6]*1000, 
-                         CI_lower_ogmap=ogmap_estimates$LowCIval[1:6]*1000)
-
+                         ogmap=(as.numeric(ogmap_estimates$Estimate[1:6])*1e6), 
+                         CI_upper_ogmap= ogmap_estimates$UpCIval[1:6]*1e6, 
+                         CI_lower_ogmap=ogmap_estimates$LowCIval[1:6]*1e6)
+value=1
 comparison <- comparison %>% 
-  mutate(Ogmap_CI = ogmap >= CI_lower_ogmap & value <= CI_upper_ogmap) %>% 
-  mutate(GAM_CI = fit_simple_gam >= CI_lower_gam & value <= CI_upper_gam)
+  dplyr::mutate(Ogmap_CI = ogmap >= CI_lower_ogmap & ogmap <= CI_upper_ogmap) %>% 
+  dplyr::mutate(GAM_CI = fit_simple_gam >= CI_lower_gam & fit_simple_gam <= CI_upper_gam)
+
+# 
+# dplyr::between()
+# 
+# between(1:12, 7, 9)
 
 # comparison <- comparison %>% 
 #   mutate(percent=tbio/ogmap)
