@@ -8,8 +8,13 @@ F_data <- readr::read_table("PB_fall.dat.complete")
 biomass_year <- F_data %>%
   dplyr::group_by(year) %>%
   dplyr::select(biomass,year) %>%
-  dplyr::summarise(t_bio=sum(biomass),SD_bio=sd(biomass),CI_lower=quantile(biomass, prob = c(0.025)),CI_upper=quantile(biomass, prob = c(0.975)))
-      # dont need CI here
+  dplyr::summarise(t_bio=sum(biomass)
+                   )
+
+
+      # dont need CI here ,SD_bio=sd(biomass),CI_lower=quantile(biomass, prob = c(0.025)),CI_upper=quantile(biomass, prob = c(0.975)
+
+
 #                       
 # biomass_year <- F_data %>% 
 #   dplyr::group_by(year) %>% 
@@ -56,14 +61,35 @@ ogmap_estimates <- readr::read_table("biomass__Ogmap2 - Demo.log", skip = 2)
 
 
 # in kg
-comparison <- data.frame(dat_grid_pred,
-                         ogmap=(as.numeric(ogmap_estimates$Estimate[1:6])*1e6), 
-                         CI_upper_ogmap= ogmap_estimates$UpCIval[1:6]*1e6, 
-                         CI_lower_ogmap=ogmap_estimates$LowCIval[1:6]*1e6)
-value=1
+comparison <- data.frame(biomass_year, Predictions_summary,
+                         ogmap=(as.numeric(ogmap_estimates$Estimate)*1e6), 
+                         CI_upper_ogmap= ogmap_estimates$UpCIval*1e6, 
+                         CI_lower_ogmap=ogmap_estimates$LowCIval*1e6)
+comparison <- comparison[ -c(3,4,5,7,8) ]
+comparison <- comparison[c(1:6,8,7)]
+
 comparison <- comparison %>% 
-  dplyr::mutate(Ogmap_CI = ogmap >= CI_lower_ogmap & ogmap <= CI_upper_ogmap) %>% 
-  dplyr::mutate(GAM_CI = fit_simple_gam >= CI_lower_gam & fit_simple_gam <= CI_upper_gam)
+  dplyr::mutate(Ogmap_CI = t_bio*1000 >= CI_lower_ogmap & t_bio*1000 <= CI_upper_ogmap) %>% 
+  dplyr::mutate(GAM_CI = t_bio >= CI_lower & t_bio <= CI_upper)
+
+#### PErcentage of tim in the interval 
+Ogmap_percent <- sum(comparison$Ogmap_CI, na.rm = TRUE)/nrow(comparison)*100
+Gam_percent   <- sum(comparison$GAM_CI, na.rm = TRUE)/nrow(comparison)*100
+Result_CI <- data.frame(
+  model=c("Ogmap_percent","Gam_percent") ,  
+  value=c(Ogmap_percent,Gam_percent)
+)
+# Barplot
+ggplot(Result_CI, aes(x=model, y=value)) + 
+  geom_bar(stat = "identity", fill='lightblue', color ='black')+
+  geom_text(aes(label=paste0(value,'%')),  
+            position = position_dodge(width = 1),
+            vjust = 10)+
+  ggtitle('Percentage of time the simulated biomass falls within the model CI
+           500 simulations to run for parameters (predict_intervals)
+           100 samples using 0.1% of the entire dataset')+
+  theme(plot.title = element_text(hjust = 0.5))
+ 
 
 # 
 # dplyr::between()
@@ -81,6 +107,59 @@ comparison <- comparison %>%
 # write.table(year_commas,"years.txt")
 
 
+###### Graphing ######
+library(ggformula)
+library(ggpubr)
+  #### Histogram biomass ####
+
+truth <- gf_histogram(~t_bio, data = biomass_year,
+             fill = "skyblue", 
+             color = "black"
+)
+  
+ogmap <-  gf_histogram(~Estimate, data = ogmap_estimates,
+               fill = "skyblue", 
+               color = "black"
+  )
+
+  gf_histogram(~UpCIval, data = ogmap_estimates,
+               fill = "skyblue", 
+               color = "black"
+  )
+  
+  gf_histogram(~LowCIval, data = ogmap_estimates,
+               fill = "skyblue", 
+               color = "black"
+  )
 
 
+gam <-  gf_histogram(~fit_simple_gam, data = Predictions_summary,
+               fill = "skyblue", 
+               color = "black"
+  )
+  
+  gf_histogram(~CI_upper, data = Predictions_summary,
+               fill = "skyblue", 
+               color = "black"
+  )
+  
+  gf_histogram(~CI_lower, data = Predictions_summary,
+               fill = "skyblue", 
+               color = "black"
+  )
 
+ggarrange(ogmap,truth,gam,ncol = 3)
+  
+#### Does the simulation fit the models interval? ####
+  Interval_gam <- list()
+  for (i in 1:nrow(Predictions_summary)) {
+    Interval_gam[[i]] <- dplyr::between(biomass_year$t_bio[i], Predictions_summary$CI_lower[i], Predictions_summary$CI_upper[i])
+  }
+  Interval_ogmap <- list()
+  for (i in 1:nrow(Predictions_summary)) {
+    Interval_ogmap[[i]] <- dplyr::between(biomass_year$t_bio[i]*1000, ogmap_estimates$LowCIval[i]*1e6, ogmap_estimates$UpCIval[i]*1e6)
+  }
+
+  Compare_CI <- as.data.frame(Interval_gam)
+plot(biomass_year$t_bio[1:40],Predictions_summary$fit_simple_gam)
+plot(biomass_year$t_bio[1:40],ogmap_estimates$Estimate[1:40])

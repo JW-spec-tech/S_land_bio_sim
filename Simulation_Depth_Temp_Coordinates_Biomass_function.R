@@ -72,7 +72,7 @@ S_land_bio_sim <- function(n,x,y,auto,var,nug,mean){
   #### 3. Generate Main Depth and temporary sub depths ####
   Main_L_copy <- Main_L #make a copy
   Main_L_copy@data@values <- (Main_L_copy@data@values*1126)+58 #make depth
-  landscapetools::show_landscape(Main_L_copy) # visualize main ladnscape
+  # landscapetools::show_landscape(Main_L_copy) # visualize main ladnscape
   value <- Main_L_copy@data@values # get main landscape depths
   
   writeRaster(Main_L_copy,"main_L",overwrite=TRUE)
@@ -140,12 +140,13 @@ S_land_bio_sim <- function(n,x,y,auto,var,nug,mean){
   #     k=paste0("s_depth_DF",j)
   #     biomass_mean_sub[i,j] <- dnorm(((Sub_L_M[[j]]@data@values[i]) - 312.5), 0, 100)/dnorm(0,0,100)*dnorm(((temps_sub[[k]][["fit"]][[i]]) - 2.916), 0, 2)/dnorm(0,0,2)
   #   }}
-  
-  scale_100 <-dnorm(0,0,100)
-  scale_2<- dnorm(0,0,2)
+  depth_sd = 200
+  temp_sd  = 2
+  scale_depth <-dnorm(0,0,depth_sd)
+  scale_temp<- dnorm(0,0,2)
   for (j in 1:n){
     k=paste0("s_depth_DF",j)
-    biomass_mean_sub[,j] <- (dnorm(((Sub_L_M[[j]]@data@values) - 312.5), 0, 100)/scale_100 *dnorm(((temps_sub[[k]][["fit"]]) - 2.916), 0, 2)/scale_2) 
+    biomass_mean_sub[,j] <- (dnorm(((Sub_L_M[[j]]@data@values) - 312.5), 0, depth_sd)/scale_depth *dnorm(((temps_sub[[k]][["fit"]]) - 2.916), 0, temp_sd)/scale_temp) 
   }
   
   biomass_mean_sub
@@ -190,7 +191,7 @@ S_land_bio_sim <- function(n,x,y,auto,var,nug,mean){
     depth   = value  # get froim Main_L_COPY
     temp    = temps_sub[[k]][["fit"]]
     coord   = coordinates(Main_L)
-    biomass = rTweedie(biomass_mean_sub[,i], p = 1.76, phi= 2)
+    biomass = biomass_mean_sub[,i]
       #### NEEDS PATCH_RASTER CODE ABOVE ####
     name <- paste('item:',i,sep='')
     tmp <- list(depth=depth, temp=temp, coord=coord, biomass=biomass,stratum=stratum)
