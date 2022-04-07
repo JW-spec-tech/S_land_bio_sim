@@ -80,14 +80,15 @@ Result_CI <- data.frame(
   value=c(Ogmap_percent,Gam_percent)
 )
 # Barplot
+library(ggplot2)
 ggplot(Result_CI, aes(x=model, y=value)) + 
   geom_bar(stat = "identity", fill='lightblue', color ='black')+
   geom_text(aes(label=paste0(value,'%')),  
             position = position_dodge(width = 1),
-            vjust = 10)+
+            vjust = 7)+
   ggtitle('Percentage of time the simulated biomass falls within the model CI
            500 simulations to run for parameters (predict_intervals)
-           100 samples using 0.1% of the entire dataset')+
+           500 samples using 0.1% of the entire dataset')+
   theme(plot.title = element_text(hjust = 0.5))
  
 
