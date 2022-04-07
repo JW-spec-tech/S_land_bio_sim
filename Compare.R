@@ -12,45 +12,6 @@ biomass_year <- F_data %>%
                    )
 
 
-      # dont need CI here ,SD_bio=sd(biomass),CI_lower=quantile(biomass, prob = c(0.025)),CI_upper=quantile(biomass, prob = c(0.975)
-
-
-#                       
-# biomass_year <- F_data %>% 
-#   dplyr::group_by(year) %>% 
-#   dplyr::select(biomass,year) %>%
-#   mean
-# 
-#                                                      
-# quantile(F_data$biomass, prob = c(0.025, 0.975))
-# 
-# 
-# 
-# View(biomass_year)
-# 
-# trawl_year <- data.frame(table(s_data$year)) 
-# 
-# 
-# 
-# hist_biomass <- s_data %>% 
-#   filter(year==1991) %>% 
-#   dplyr::select(biomass)
-# hist(hist_biomass$biomass)
-# 
-# 
-# 
-# gf_raster(lat~long, fill = ~log(biomass), data = F_data,
-#           show.legend = NA) %>% 
-#   gf_facet_wrap(~year)+
-#   scale_fill_viridis_c()
-# 
-# 
-# 
-# D <- expand.grid(x = 0:5, y = 0:5)
-# D$z <- runif(nrow(D))
-# gf_tile(y ~ x, fill = ~z, data = D)
-# gf_tile(z ~ x + y, data = D)
-
 
 ogmap_estimates <- readr::read_table("biomass__Ogmap2 - Demo.log", skip = 2)
 
