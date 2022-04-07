@@ -15,7 +15,7 @@ library(kableExtra)
 
 
 #create the cluster
-n.cores <- parallelly::availableCores() - 1
+n.cores <- parallelly::availableCores() - 3
 my.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -39,7 +39,7 @@ Sys.time()
 #### 2. Define grid size and number of years ####
 
 start_year =1991
-years = 100
+years = files <-  as.numeric(length(list.files('sim/', pattern = ".",all.files = FALSE, recursive = TRUE, full.names = TRUE)))
 size = 500
 
 trawl_data <- readr::read_table("PB_fall.dat")
