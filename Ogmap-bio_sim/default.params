@@ -1,0 +1,18 @@
+# default.params 
+guide_names = ['lat', 'long', 'rootdepth', 'stratum']
+years='all'
+#years=[1991,1992,1993,1994,1995]
+#years=[1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036,2037,2038,2039,2040]
+#years=[1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019]
+#years=[1995]
+#bwopt = 1  # Specify the bandwidths
+bwopt = 2  # Read bandwidths from median bandwidth file
+#bwopt = 3  #Create the median.bandwidth file and then use the result
+cb = 'y' ; cbmethod = root_CT0
+resamples = 10000 ; doublesamples=0 # or (199,199)
+#ref_probs = [ 0.025, 0.05, 0.075, 0.1, 0.125, 0.15, 0.175, 0.2, 0.225, 0.25, 0.275, 0.3, 0.325, 0.35, 0.375, 0.4, 0.425, 0.45, 0.475, 0.525, 0.55, 0.575, 0.6, 0.625, 0.65, 0.675, 0.7, 0.725, 0.75, 0.775, 0.8, 0.825, 0.85, 0.875, 0.9, 0.925, 0.95, 0.975 ]
+ref_probs = [0.025,0.975]
+ref_vals = [] #just to save needing to CR through it #COMMENT OUT FOR FEMALE OGMAP RUN
+#ref_vals = [81.6,218]  #UNCOMMENT FOR FEMALE OGMAP RUN
+gini = False
+sanity = False
