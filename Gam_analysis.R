@@ -1,4 +1,5 @@
-
+library(arrow)
+memory.limit(100000)
 #### 1. Load sim names
 file_list <- list.files("Result/", full.names=TRUE)
 
