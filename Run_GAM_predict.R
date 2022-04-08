@@ -54,17 +54,29 @@ dat_grid_x_y <- as.data.frame(expand_grid(long=seq(0.5,size,by=1),
 dat_grid_year <- c(start_year:(start_year+years-1))
 
 
+#### Get PRedicted biomass + CI function ####
+
+Get_biomass_Ci_write <- function(fit=simple_gam,dat_per_year=dplyr::bind_cols(dat_grid_x_y,year=year)){
+  year=year
+  sims <- sspm:::produce_sims(fit, dat_per_year, 500)
+  sims <- exp(sims)
+  
+  sims_total <- apply(sims, MARGIN = 2, FUN = "sum")
+  sims_point <- mean(sims_total)
+  
+  alpha = 0.05
+  sims_CI <- quantile(sims_total, prob = c(alpha/2, 1-alpha/2))
+  output <- data.frame(year=year,point_est = sims_point, lower = sims_CI[1], upper = sims_CI[2])
+  write_parquet(output,paste0('Result/model_', year))
+}
+
 #### 3. Run GAM Predictions ####
 Sys.time()
 x <- foreach(
   year = dat_grid_year,
   .packages = c('mgcv','dplyr','sspm','arrow')
 ) %dopar% {
-  dat_per_year <- dplyr::bind_cols(dat_grid_x_y,year=year) %>% 
-    dplyr::mutate(fit_simple_gam = predict.bam(simple_gam,type = "response", newdata = .)) %>%
-    dplyr::bind_cols(predict_intervals(object_fit = simple_gam, new_data = ., PI= F, n=500))
-  # write.table(dat_per_year, file = paste0('Result/model_', year,'.csv'), sep = ",",row.names = F)
-  write_parquet(dat_per_year,paste0('Result/model_', year))
+  Get_biomass_Ci_write()
   gc()
 }
 Sys.time()
