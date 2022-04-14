@@ -23,15 +23,17 @@ ogmap_estimates <- readr::read_table("biomass__Ogmap2 - Demo.log", skip = 2)
 
 # in kg
 comparison <- data.frame(biomass_year, Predictions_summary,
-                         ogmap=(as.numeric(ogmap_estimates$Estimate)*1e6), 
-                         CI_upper_ogmap= ogmap_estimates$UpCIval*1e6, 
-                         CI_lower_ogmap=ogmap_estimates$LowCIval*1e6)
-comparison <- comparison[ -c(3,4,5,7,8) ]
+                         ogmap=(as.numeric(ogmap_estimates$Estimate)*1e3), 
+                         CI_upper_ogmap= ogmap_estimates$UpCIval*1e3, 
+                         CI_lower_ogmap=ogmap_estimates$LowCIval*1e3)
+comparison <- comparison[ -c(3) ]
 comparison <- comparison[c(1:6,8,7)]
 
+
+
 comparison <- comparison %>% 
-  dplyr::mutate(Ogmap_CI = t_bio*1000 >= CI_lower_ogmap & t_bio*1000 <= CI_upper_ogmap) %>% 
-  dplyr::mutate(GAM_CI = t_bio >= CI_lower & t_bio <= CI_upper)
+  dplyr::mutate(Ogmap_CI = t_bio >= CI_lower_ogmap & t_bio <= CI_upper_ogmap) %>% 
+  dplyr::mutate(GAM_CI = t_bio >= lower & t_bio <= upper)
 
 #### PErcentage of tim in the interval 
 Ogmap_percent <- sum(comparison$Ogmap_CI, na.rm = TRUE)/nrow(comparison)*100

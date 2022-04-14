@@ -1,4 +1,4 @@
-S_land_bio_sim <- function(n,x,y,auto,var,nug,mean){
+S_land_bio_sim <- function(n,x,y,auto,var,nug,mean,variation){
 
   
   #### 1. Load Packages ####
@@ -159,10 +159,11 @@ S_land_bio_sim <- function(n,x,y,auto,var,nug,mean){
   biomass_variation <- nlm_gaussianfield(x,
                                          y,
                                          resolution = 1,
-                                         autocorr_range = 50,
-                                         mag_var = 5,
+                                         autocorr_range = 100*10^variation,
+                                         mag_var = 50,
                                          nug = 0.2,
                                          mean = 0.5)
+  
   
   # Multiply the landscape with mean biomass at every location
   for (i in 1:n) {
