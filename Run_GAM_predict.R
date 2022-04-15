@@ -12,12 +12,24 @@ library(tidyverse)
 library(kableExtra)
 library(dplyr)
 
+#### 0. Package installation for cluster ####
+# # Package names
+# packages <- c("readr", "tidyr", "foreach", "doParallel", "parallelly","ranger","tidyverse","kableExtra","arrow")
+# 
+# # Install packages not yet installed
+# installed_packages <- packages %in% rownames(installed.packages())
+# if (any(installed_packages == FALSE)) {
+#   install.packages(packages[!installed_packages])
+# }
+
 #### 1. Create and Start Cluster ####
 
 
 #create the cluster
-n.cores <- parallelly::availableCores() - 3
-my.cluster <- parallel::makeCluster(
+# n.cores <- parallelly::availableCores()/2   
+# For windows
+  n.cores <- as.numeric(Sys.getenv('OMP_NUM_THREADS'))
+  my.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
 )
@@ -75,7 +87,7 @@ trawl_data$year_f <- factor(trawl_data$year)
 simple_gam <<- list()
 
 #define number of data frames to split into
-split=10
+split=5
 n_chunk <- length(dat_grid_year)/split
 #split data frame into groups per year
 split_data <- trawl_data %>% 
