@@ -1,4 +1,4 @@
-S_land_bio_sim <- function(n,x,y,auto,var,nug,mean,variation){
+S_land_bio_sim <- function(n,x,y,auto,var,nug,mean,variation=1.5){
 
   
   #### 1. Load Packages ####
@@ -156,14 +156,19 @@ S_land_bio_sim <- function(n,x,y,auto,var,nug,mean,variation){
   #### 6. Add Variation in shrimp biomass
   
   # Generate a landscape for variation
-  biomass_variation <- nlm_gaussianfield(x,
-                                         y,
-                                         resolution = 1,
-                                         autocorr_range = 100*10^variation,
-                                         mag_var = 50,
-                                         nug = 0.2,
-                                         mean = 0.5)
+  biomass_variation <- nlm_randomcluster(ncol = x, nrow = y,
+                                      p = 0.57,
+                                      ai = c(0.5, 0.25, 0.25))
   
+  biomass_variation@data@values <- biomass_variation@data@values*variation
+  # biomass_variation <- nlm_gaussianfield(x,
+  #                                        y,
+  #                                        resolution = 1,
+  #                                        autocorr_range = 100*10^variation,
+  #                                        mag_var = 50,
+  #                                        nug = 0.2,
+  #                                        mean = 0.5)
+  # 
   
   # Multiply the landscape with mean biomass at every location
   for (i in 1:n) {
