@@ -44,7 +44,7 @@ Result_CI <- data.frame(
 )
 # Barplot
 library(ggplot2)
-ggplot(Result_CI, aes(x=model, y=value)) + 
+plot <- ggplot(Result_CI, aes(x=model, y=value)) + 
   geom_bar(stat = "identity", fill='lightblue', color ='black')+
   geom_text(aes(label=paste0(value,'%')),  
             position = position_dodge(width = 1),
@@ -54,7 +54,9 @@ ggplot(Result_CI, aes(x=model, y=value)) +
            500 samples using 0.1% of the entire dataset')+
   theme(plot.title = element_text(hjust = 0.5))
  
-
+ggsave("plot_test",
+       plot = plot,
+       device = "png")
 # 
 # dplyr::between()
 # 
@@ -72,58 +74,58 @@ ggplot(Result_CI, aes(x=model, y=value)) +
 
 
 ###### Graphing ######
-library(ggformula)
-library(ggpubr)
-  #### Histogram biomass ####
-
-truth <- gf_histogram(~t_bio, data = biomass_year,
-             fill = "skyblue", 
-             color = "black"
-)
-  
-ogmap <-  gf_histogram(~Estimate, data = ogmap_estimates,
-               fill = "skyblue", 
-               color = "black"
-  )
-
-  gf_histogram(~UpCIval, data = ogmap_estimates,
-               fill = "skyblue", 
-               color = "black"
-  )
-  
-  gf_histogram(~LowCIval, data = ogmap_estimates,
-               fill = "skyblue", 
-               color = "black"
-  )
-
-
-gam <-  gf_histogram(~fit_simple_gam, data = Predictions_summary,
-               fill = "skyblue", 
-               color = "black"
-  )
-  
-  gf_histogram(~CI_upper, data = Predictions_summary,
-               fill = "skyblue", 
-               color = "black"
-  )
-  
-  gf_histogram(~CI_lower, data = Predictions_summary,
-               fill = "skyblue", 
-               color = "black"
-  )
-
-ggarrange(ogmap,truth,gam,ncol = 3)
-  
-#### Does the simulation fit the models interval? ####
-  Interval_gam <- list()
-  for (i in 1:nrow(Predictions_summary)) {
-    Interval_gam[[i]] <- dplyr::between(biomass_year$t_bio[i], Predictions_summary$CI_lower[i], Predictions_summary$CI_upper[i])
-  }
-  Interval_ogmap <- list()
-  for (i in 1:nrow(Predictions_summary)) {
-    Interval_ogmap[[i]] <- dplyr::between(biomass_year$t_bio[i]*1000, ogmap_estimates$LowCIval[i]*1e6, ogmap_estimates$UpCIval[i]*1e6)
-  }
-
-  Compare_CI <- as.data.frame(Interval_gam)
-plot(biomass_year$t_bio[1:40],Predictions_summary$fit_simple_gam)
-plot(biomass_year$t_bio[1:40],ogmap_estimates$Estimate[1:40])
+# library(ggformula)
+# library(ggpubr)
+#   #### Histogram biomass ####
+# 
+# truth <- gf_histogram(~t_bio, data = biomass_year,
+#              fill = "skyblue", 
+#              color = "black"
+# )
+#   
+# ogmap <-  gf_histogram(~Estimate, data = ogmap_estimates,
+#                fill = "skyblue", 
+#                color = "black"
+#   )
+# 
+#   gf_histogram(~UpCIval, data = ogmap_estimates,
+#                fill = "skyblue", 
+#                color = "black"
+#   )
+#   
+#   gf_histogram(~LowCIval, data = ogmap_estimates,
+#                fill = "skyblue", 
+#                color = "black"
+#   )
+# 
+# 
+# gam <-  gf_histogram(~fit_simple_gam, data = Predictions_summary,
+#                fill = "skyblue", 
+#                color = "black"
+#   )
+#   
+#   gf_histogram(~CI_upper, data = Predictions_summary,
+#                fill = "skyblue", 
+#                color = "black"
+#   )
+#   
+#   gf_histogram(~CI_lower, data = Predictions_summary,
+#                fill = "skyblue", 
+#                color = "black"
+#   )
+# 
+# ggarrange(ogmap,truth,gam,ncol = 3)
+#   
+# #### Does the simulation fit the models interval? ####
+#   Interval_gam <- list()
+#   for (i in 1:nrow(Predictions_summary)) {
+#     Interval_gam[[i]] <- dplyr::between(biomass_year$t_bio[i], Predictions_summary$CI_lower[i], Predictions_summary$CI_upper[i])
+#   }
+#   Interval_ogmap <- list()
+#   for (i in 1:nrow(Predictions_summary)) {
+#     Interval_ogmap[[i]] <- dplyr::between(biomass_year$t_bio[i]*1000, ogmap_estimates$LowCIval[i]*1e6, ogmap_estimates$UpCIval[i]*1e6)
+#   }
+# 
+#   Compare_CI <- as.data.frame(Interval_gam)
+# plot(biomass_year$t_bio[1:40],Predictions_summary$fit_simple_gam)
+# plot(biomass_year$t_bio[1:40],ogmap_estimates$Estimate[1:40])
