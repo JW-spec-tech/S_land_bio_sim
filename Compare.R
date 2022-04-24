@@ -47,7 +47,6 @@ Result_CI <- data.frame(
   value=c(Ogmap_percent,Gam_percent)
 )
 # Barplot
-library(ggplot2)
 plot <- ggplot(Result_CI, aes(x=model, y=value)) + 
   geom_bar(stat = "identity", fill='lightblue', color ='black')+
   geom_text(aes(label=paste0(value,'%')),  
