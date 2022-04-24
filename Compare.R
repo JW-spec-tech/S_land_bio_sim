@@ -1,9 +1,12 @@
 library(dplyr)
 library(mosaic)
+library(arrow)
+library(ggplot2)
 # Simulation stats 
 
 # Actual stats
 F_data <- readr::read_table("PB_fall.dat.complete")
+
 
 biomass_year <- F_data %>%
   dplyr::group_by(year) %>%
@@ -12,8 +15,9 @@ biomass_year <- F_data %>%
                    )
 
 
-
+#Load predictions
 ogmap_estimates <- readr::read_table("biomass__Ogmap2 - Demo.log", skip = 2)
+Predictions_summary <- read_parquet("Predictions_summary")
 
 # gam_biomass_year <- dat_grid %>% 
 #   dplyr::group_by(year) %>% 
