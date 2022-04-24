@@ -54,7 +54,7 @@ plot <- ggplot(Result_CI, aes(x=model, y=value)) +
            500 samples using 0.1% of the entire dataset')+
   theme(plot.title = element_text(hjust = 0.5))
  
-ggsave("plot_test",
+ggsave("plot_test.png",
        plot = plot,
        device = "png")
 # 
