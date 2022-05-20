@@ -1,5 +1,5 @@
 
-Make_patch_domain_arena_DAT <- function(patches,the_stack){
+Make_patch_domain_arena_DAT <- function(size,patches,the_stack){
   # Generating areas
   
   patches_area <- patches %>% 
@@ -109,12 +109,12 @@ Make_patch_domain_arena_DAT <- function(patches,the_stack){
   for (i in f_list) {
     
     listOfDataFrames[[i]] <- data.frame(
-      year=   rep(1990+as.numeric(substring(i,4)),250000),
+      year=   rep(1990+as.numeric(substring(i,4)),((size-1)^2)),
       lat =   output[[i]][["coord.x"]],
       long =  output[[i]][["coord.y"]],
       depth = output[[i]][["depth"]],
-      NAFO =  rep("3K", 250000),
-      sfa =   rep(6,250000),
+      NAFO =  rep("3K", ((size-1)^2)),
+      sfa =   rep(6,((size-1)^2)),
       stratum = output[[i]][["stratum"]],
       biomass=(output[[i]][["biomass"]])
     )
