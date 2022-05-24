@@ -60,6 +60,26 @@ plot <- ggplot(Result_CI, aes(x=model, y=value)) +
 ggsave("plot_test.png",
        plot = plot,
        device = "png")
+
+
+#graph Confidence Interval coverage per year
+# Create ggplot object
+data_Graph <- ggplot(comparison, aes(year))
+
+# Create graph
+data_Graph +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "red", alpha=0.25)+
+  geom_line(aes(y=point_est, colour = "red"))+
+  geom_ribbon(aes(ymin = CI_lower_ogmap, ymax = CI_upper_ogmap), fill = "lightblue", alpha=0.5)+
+  geom_line(aes(y=ogmap, colour = "lightblue"))+
+  geom_line(aes(y=t_bio, colour = "black"))+
+  scale_color_manual(name= "Biomass", labels = c("Total biomass","GAM", "OGmap"),values = c("black", "red","blue"))+
+  labs(title = "Coverage of Confidence Intervals
+       GAM VS OGmap", x="Year (simulation #)", y="Biomass in kg")+
+  theme(plot.title = element_text(hjust = 0.5))
+  
+
+
 # 
 # dplyr::between()
 # 

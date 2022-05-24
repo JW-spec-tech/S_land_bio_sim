@@ -176,4 +176,4 @@ parallel::stopCluster(cl = my.cluster)
 # sum(dat_per_year$fit_simple_gam)
 # Predictions_summary[1]
 
-read_parquet('Result/model')
+# read_parquet('Result/model')
