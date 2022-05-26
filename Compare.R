@@ -82,7 +82,7 @@ CI_plot <- data_Graph +
 ggsave("CI_plot.png",
        plot = CI_plot,
        device = "png",
-       width = 4000,
+       width = 12000,
        height = 1835,
        units = "px",
        limitsize = F)
