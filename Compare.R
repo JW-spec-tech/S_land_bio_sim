@@ -53,9 +53,10 @@ plot <- ggplot(Result_CI, aes(x=model, y=value)) +
             position = position_dodge(width = 1),
             vjust = 7)+
   ggtitle('Percentage of time the simulated biomass falls within the model CI
-           500 simulations to run for parameters (predict_intervals)
+           20 simulations to run for parameters (predict_intervals)
            500 samples using 0.1% of the entire dataset')+
   theme(plot.title = element_text(hjust = 0.5))
+plot
  
 ggsave("plot_test.png",
        plot = plot,
@@ -67,7 +68,7 @@ ggsave("plot_test.png",
 data_Graph <- ggplot(comparison, aes(year))
 
 # Create graph
-data_Graph +
+CI_plot <- data_Graph +
   geom_ribbon(aes(ymin = lower, ymax = upper), fill = "red", alpha=0.25)+
   geom_line(aes(y=point_est, colour = "red"))+
   geom_ribbon(aes(ymin = CI_lower_ogmap, ymax = CI_upper_ogmap), fill = "lightblue", alpha=0.5)+
@@ -78,7 +79,9 @@ data_Graph +
        GAM VS OGmap", x="Year (simulation #)", y="Biomass in kg")+
   theme(plot.title = element_text(hjust = 0.5))
   
-
+ggsave("CI_plot.png",
+       plot = CI_plot,
+       device = "png")
 
 # 
 # dplyr::between()
