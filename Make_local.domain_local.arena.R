@@ -1,5 +1,5 @@
 
-Make_patch_domain_arena_DAT <- function(size,patches,the_stack){
+Make_patch_domain_arena_DAT <- function(size,patches,the_stack,percent){
   # Generating areas
   
   patches_area <- patches %>% 
@@ -16,7 +16,7 @@ Make_patch_domain_arena_DAT <- function(size,patches,the_stack){
   # It also does the same process than above with a min size poof 20k
   sample_number_per_area <- patches_area %>% 
     dplyr::select(bound_id,bound_area) %>% 
-    mutate(samples=as.numeric(round(bound_area/30))) %>% # sets # of samples
+    mutate(samples=as.numeric(round(bound_area/(1/(percent/100))))) %>% # sets # of samples to % of original data
     mutate(samples = replace(samples, samples<3, 3)) # Make sure each strata has 3 or more samples.
   
   sample_vector <- sample_number_per_area$samples
