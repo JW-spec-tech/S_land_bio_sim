@@ -74,7 +74,7 @@ CI_plot <- data_Graph +
   geom_ribbon(aes(ymin = CI_lower_ogmap, ymax = CI_upper_ogmap), fill = "lightblue", alpha=0.5)+
   geom_line(aes(y=ogmap, colour = "lightblue"))+
   geom_line(aes(y=t_bio, colour = "black"))+
-  scale_color_manual(name= "Biomass", labels = c("Total biomass","GAM", "OGmap"),values = c("black", "red","blue"))+
+  scale_color_manual(name= "Biomass", labels = c("Total biomass","GAM", "OGmap"),values = c("black", "blue","red"))+
   labs(title = "Coverage of Confidence Intervals
        GAM VS OGmap", x="Year (simulation #)", y="Biomass in kg")+
   theme(plot.title = element_text(hjust = 0.5))
