@@ -54,7 +54,7 @@ plot <- ggplot(Result_CI, aes(x=model, y=value)) +
             vjust = 7)+
   ggtitle('Percentage of time the simulated biomass falls within the model CI
            20 simulations to run for parameters (predict_intervals)
-           500 samples using 3% of the entire dataset')+
+           500 samples using 2% of the entire dataset')+
   theme(plot.title = element_text(hjust = 0.5))
 plot
  
