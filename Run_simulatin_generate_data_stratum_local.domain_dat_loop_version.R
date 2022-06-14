@@ -31,6 +31,7 @@ var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher var
 
 #### Loop to run replicates os simulations in individual folders ####
 for (rep in 1:reps) {
+  print(paste("Replicate #",rep))
   seeds = seed - 1 + rep
   set.seed(seeds)
   newdir <- paste("Run",rep,"Size",size,"seed",seeds,"n_sim",sims,Sys.Date())
