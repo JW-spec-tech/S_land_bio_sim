@@ -47,6 +47,7 @@ for (rep in 1:reps) {
   #### 3. Slice data file ####
   Make_PB_fall.dat()
   setwd(cwd)
+  gc()
 }
 print(paste("End of Sim generation @",Sys.time()))
 
