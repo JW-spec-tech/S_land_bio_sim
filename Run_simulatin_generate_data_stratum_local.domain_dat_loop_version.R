@@ -35,9 +35,10 @@ for (rep in 1:reps) {
   print(paste("Replicate #",rep))
   seeds = seed - 1 + rep
   set.seed(seeds)
-  newdir <- paste("Run",rep,"Size",size,"seed",seeds,"n_sim",sims,"Percent",percent,Sys.Date())
-  dir.create(newdir)      # should test for error
   cwd <- getwd()          # CURRENT dir
+  setwd("Data/")
+  newdir <- paste("Run",rep,"Size",size,"seed",seeds,"n_sim",sims,"Percent",percent,Sys.Date(),sep = "_")
+  dir.create(newdir)     # Create new directory
   setwd(newdir) 
   write.table(as.data.frame(newdir),"seed")
   #### 1. Run the sim ####
