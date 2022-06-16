@@ -37,7 +37,7 @@ for (rep in 1:reps) {
   set.seed(seeds)
   cwd <- getwd()          # CURRENT dir
   setwd("Data/")
-  newdir <- paste("Run",rep,"Size",size,"seed",seeds,"n_sim",sims,"Percent",percent,Sys.Date(),sep = "_")
+  newdir <- paste("Run",rep,"Size",size,"seed",seeds,"nsim",sims,"Percent",percent,Sys.Date(),sep = "_")
   dir.create(newdir)     # Create new directory
   setwd(newdir) 
   write.table(as.data.frame(newdir),"seed")
@@ -52,6 +52,7 @@ for (rep in 1:reps) {
   setwd(cwd)
   gc()
 }
+
 print(paste("End of Sim generation @",Sys.time()))
 
 
