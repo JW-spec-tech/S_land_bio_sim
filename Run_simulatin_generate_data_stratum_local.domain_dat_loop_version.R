@@ -28,6 +28,8 @@ size= as.numeric(Sys.getenv('SIZE')) # Size of the Landscape
 seed= as.numeric(Sys.getenv('SEED')) # Starting seed
 var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher variation = increased biomass variation
 
+percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
+
 #### Loop to run replicates os simulations in individual folders ####
 for (rep in 1:reps) {
   print(paste("Replicate #",rep))
@@ -42,7 +44,7 @@ for (rep in 1:reps) {
   results <- S_land_bio_sim(sims,size,variation = var) # higher variation = increased biomass variation
   
   #### 2. Write the ogmap files ####
-  Make_patch_domain_arena_DAT(size,patches=results$patches_list$patches,the_stack=results$the_stack,percent=2)
+  Make_patch_domain_arena_DAT(size,patches=results$patches_list$patches,the_stack=results$the_stack,percent=percent)
   
   #### 3. Slice data file ####
   Make_PB_fall.dat()
