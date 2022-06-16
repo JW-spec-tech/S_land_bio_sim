@@ -35,7 +35,7 @@ for (rep in 1:reps) {
   print(paste("Replicate #",rep))
   seeds = seed - 1 + rep
   set.seed(seeds)
-  newdir <- paste("Run",rep,"Size",size,"seed",seeds,"n_sim",sims,Sys.Date())
+  newdir <- paste("Run",rep,"Size",size,"seed",seeds,"n_sim",sims,"Percent",percent,Sys.Date())
   dir.create(newdir)      # should test for error
   cwd <- getwd()          # CURRENT dir
   setwd(newdir) 
@@ -52,5 +52,6 @@ for (rep in 1:reps) {
   gc()
 }
 print(paste("End of Sim generation @",Sys.time()))
+
 
 # ################################################
