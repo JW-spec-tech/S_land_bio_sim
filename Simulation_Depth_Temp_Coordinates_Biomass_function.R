@@ -91,7 +91,7 @@ S_land_bio_sim <- function(n,x,y,auto,var,nug,mean,variation=1.5){
   
   
   # read real data
-  real <- read.csv("trawl_nl.csv")
+  real <- read.csv("../../trawl_nl.csv")
   
   # Generate gam based on real depth and temp
   gam_depth_sim <- gam(temp_bottom ~ s(sqrt(depth), bs="ad"), data = real)
