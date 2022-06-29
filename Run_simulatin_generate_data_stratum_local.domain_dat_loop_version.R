@@ -30,7 +30,7 @@ var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher var
 
 percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
 
-#### Loop to run replicates os simulations in individual folders ####
+#### Loop to run replicates of simulations in individual folders ####
 for (rep in 1:reps) {
   print(paste("Replicate #",rep))
   seeds = seed - 1 + rep
