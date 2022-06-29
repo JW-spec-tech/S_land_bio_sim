@@ -22,6 +22,8 @@ library(dplyr)
 #   install.packages(packages[!installed_packages])
 # }
 
+Size= as.numeric(Sys.getenv('SIZE')) # Get size of Landscape
+
 #### 1. Create and Start Cluster ####
 
 
@@ -54,7 +56,7 @@ Sys.time()
 
 start_year =1991
 years = files <-  as.numeric(length(list.files('sim/', pattern = ".",all.files = FALSE, recursive = TRUE, full.names = TRUE)))
-size = 500
+size = Size
 
 trawl_data <- readr::read_table("PB_fall.dat")
 trawl_data$year_f <- factor(trawl_data$year)
