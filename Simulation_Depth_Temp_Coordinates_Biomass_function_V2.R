@@ -5,7 +5,7 @@ S_land_bio_sim <- function(n,size,roughness=0.6,variation=1.5){
   
   #### 1. Load Packages ####
   # Package names
-  packages <- c("NLMR", "mgcv", "plyr", "dplyr", "raster","landscapetools","devtools","openxlsx","arrow")
+  packages <- c("mgcv", "plyr", "dplyr", "raster","landscapetools","devtools","openxlsx","arrow","sspm")
   
   # Install packages not yet installed
   installed_packages <- packages %in% rownames(installed.packages())
