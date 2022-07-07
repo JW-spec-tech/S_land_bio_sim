@@ -2,11 +2,6 @@ Make_PB_fall.dat <- function(percent=0.1,path="PB_fall.dat.complete",fname="PB_f
   
   F_data <- readr::read_table("PB_fall.dat.complete")
   
-  # names(F_data) <- F_data[1,]
-  # 
-  # F_data = F_data[-1,]
-  
-  
   propotion_strata <- F_data %>% 
                       dplyr::group_by(stratum,year) %>% 
                       dplyr::summarise(n=n()) %>% 
