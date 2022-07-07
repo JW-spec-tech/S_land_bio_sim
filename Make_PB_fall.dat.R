@@ -4,7 +4,7 @@ Make_PB_fall.dat <- function(percent=0.1,path="PB_fall.dat.complete",fname="PB_f
   
   propotion_strata <- F_data %>% 
                       dplyr::group_by(stratum,year) %>% 
-                      dplyr::summarise(n=n()) %>% 
+                      dplyr::summarise(n=(n())) %>% 
                       dplyr::mutate(min=3)
   
   propotion_strata$prop = round(ifelse(propotion_strata$n*percent<=propotion_strata$min,propotion_strata$min,ifelse(propotion_strata$n*percent>=15,15,propotion_strata$n*percent)))
