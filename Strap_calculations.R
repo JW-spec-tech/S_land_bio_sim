@@ -5,22 +5,31 @@ library(dplyr)
 library(readr)
 
 #### 1. Load data ####
-survey_raw_data <- readr::read_table("Data/Run_1_Size_100_seed_1_n_sim_100_Percent_2_2022-06-16/PB_fall.dat")
+survey_raw_data <- readr::read_table("PB_fall.dat")
 
-strata_area <- patches_area %>% 
-  select()
+strata_area <- patches %>% 
+  st_set_geometry(.,NULL) %>% 
+  dplyr::mutate(stratum=as.numeric(patch_id)) %>% 
+  units::drop_units() %>% 
+  dplyr::select(stratum,patch_area) 
+
+#### 2. Merge the area and survey data ####
+
+Survey_W_Area <- dplyr::left_join(survey_raw_data,strata_area)
 
 #### 2. Run strap calculation ####
-Strap_estimate <- survey_raw_data %>%
+Strap_estimate <- Survey_W_Area %>%
   
-  group_by(year,stratum)%>%
+  dplyr::group_by(year,stratum)%>%
+  
+  dplyr::mutate(biomass=biomass/1000) %>% 
 
-  summarize(Bj = area[1]*mean(biomass),
-            s2j = area[1]^2*var(biomass)/n()) %>% 
+  dplyr::summarize(Bj = patch_area*mean(biomass),
+            s2j = (patch_area^2)*var(biomass)/(n())) %>% 
   
-  group_by(year)%>%
+  dplyr::group_by(year)%>%
   
-  summarize(B_total = sum(Bj),B_se= sqrt(sum(s2j))) %>%
+  dplyr::summarize(B_total = sum(Bj),B_se= sqrt(sum(s2j))) %>%
   
-  mutate(lower = B_total - 1.96*B_se,
-         upper = B_total + 1.96*N_se)
+  dplyr::mutate(lower = B_total - 1.96*B_se,
+         upper = B_total + 1.96*B_se)
