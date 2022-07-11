@@ -7,6 +7,8 @@ library(ggplot2)
 
 #### 1. Load data ####
 survey_raw_data <- readr::read_table("PB_fall.dat")
+results <- read_parquet("results")
+patches <- results$patches_list$patches
 
 strata_area <- patches %>% 
   st_set_geometry(.,NULL) %>% 
