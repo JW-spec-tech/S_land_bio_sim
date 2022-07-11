@@ -1,3 +1,6 @@
+Analyse_Gam <- function(file_name='Predictions_summary') {
+  
+
 library(arrow)
 memory.limit(100000)
 #### 1. Load sim names
@@ -13,4 +16,5 @@ write_parquet(Predictions,'Predictions')
 
 #### 4. Calculate mean on each column + Write a copy
 Predictions_summary <- Predictions[, lapply(.SD,sum), by=.(year)]
-write_parquet(Predictions_summary,'Predictions_summary')
+write_parquet(Predictions_summary,file_name)
+}
