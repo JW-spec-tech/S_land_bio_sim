@@ -4,7 +4,7 @@ Analyse_Gam <- function(file_name='Predictions_summary') {
 library(arrow)
 memory.limit(100000)
 #### 1. Load sim names
-file_list <- list.files("Result/", full.names=TRUE)
+file_list <- list.files("sim/", full.names=TRUE)
 
 #### 2. Merge sims
 allData <- plyr::ldply(as.list(file_list), arrow::read_parquet)
