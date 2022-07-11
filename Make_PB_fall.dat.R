@@ -1,6 +1,6 @@
 Make_PB_fall.dat <- function(percent_f=0.1,path="PB_fall.dat.complete",fname="PB_fall.dat"){
   
-  F_data <- readr::read_table("PB_fall.dat.complete")
+  F_data <- arrow::read_parquet("PB_fall.dat.complete")
   
   propotion_strata <- F_data %>% 
                       dplyr::group_by(stratum,year) %>% 
