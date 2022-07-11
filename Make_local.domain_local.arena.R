@@ -124,5 +124,6 @@ Make_patch_domain_arena_DAT <- function(size,patches,the_stack,percent){
   
   df <- round_df(df,4)
   
-  write.table(df, file = "PB_fall.dat.complete",sep = " ", quote = F, row.names = F )
-}
+  #write.table(df, file = "PB_fall.dat.complete",sep = " ", quote = F, row.names = F )
+  write_parquet(df, "PB_fall.dat.complete")
+  }
