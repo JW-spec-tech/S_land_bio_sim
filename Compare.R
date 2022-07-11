@@ -1,3 +1,5 @@
+Compare_Graph <- function(plot_name="CI_plot.png") {
+  
 library(dplyr)
 library(mosaic)
 library(arrow)
@@ -79,13 +81,14 @@ CI_plot <- data_Graph +
        GAM VS OGmap", x="Year (simulation #)", y="Biomass in kg")+
   theme(plot.title = element_text(hjust = 0.5))
   
-ggsave("CI_plot.png",
+ggsave(plot_name,
        plot = CI_plot,
        device = "png",
        width = 24000,
        height = 1835,
        units = "px",
        limitsize = F)
+}
 
 # 
 # dplyr::between()
