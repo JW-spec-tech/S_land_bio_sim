@@ -45,6 +45,7 @@ for (rep in 1:reps) {
   write.table(as.data.frame(newdir),"seed")
   #### 1. Run the sim ####
   results <- S_land_bio_sim(sims,size,variation = var) # higher variation = increased biomass variation
+  write_parquet(results,"results")
   
   #### 2. Write the ogmap files ####
   Make_patch_domain_arena_DAT(size,patches=results$patches_list$patches,the_stack=results$the_stack,percent=percent)
