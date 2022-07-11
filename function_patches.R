@@ -66,11 +66,12 @@ Main_L_copy_rcl_clumped_sf <- Main_L_copy_rcl_clumped_sf %>%
 sspm_boundary <- spm_as_boundary(boundaries = Main_L_copy_rcl_clumped_sf, 
                                  boundary = "bound_id")
 
+# set number of strata per area as a function of size
+nb_nodes_bound_id <- round(as.numeric(sspm_boundary@boundaries$area_bound_id/500))
+
 # This makes sure we sample the surface of the polygons at random points 
-# 10 points per polygon
-# It also does the same process than above with a min size poof 20k
 voronoi <- spm_discretize(sspm_boundary, method = "tesselate_voronoi", 
-                          sample_surface = TRUE, nb_samples = 10, min_size = 50)
+                          sample_surface = TRUE, nb_samples = nb_nodes_bound_id, min_size = 50)
 
 # Other bug in sspm: we make sure all poygons are of the type POLUYGON and NOT MULTIPOLYGON
 patches <- st_cast(st_make_valid(spm_patches(voronoi), "POLYGON"))
