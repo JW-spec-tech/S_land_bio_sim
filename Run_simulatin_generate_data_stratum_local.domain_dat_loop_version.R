@@ -17,6 +17,8 @@ source(file = "Simulation_Depth_Temp_Coordinates_Biomass_function_V2.R")
 source(file = "function_patches.R")
 source(file = "Make_local.domain_local.arena.R")
 source(file = "Make_PB_fall.dat.R")
+source(file = "Gam_analysis.R")
+source(file = "Compare.R")
 
 
 memory.limit(40000)
@@ -49,6 +51,14 @@ for (rep in 1:reps) {
   
   #### 3. Slice data file ####
   Make_PB_fall.dat()
+  
+  #### 4. Analyse GAM ####
+  Analyse_Gam()
+  
+  #### 5. Run Comparison + Print graphs ####
+  Compare_Graph()
+  
+  #### 6. Return to Original WD ####
   setwd(cwd)
   gc()
 }
@@ -56,4 +66,4 @@ for (rep in 1:reps) {
 print(paste("End of Sim generation @",Sys.time()))
 
 
-# ################################################
+#################################################
