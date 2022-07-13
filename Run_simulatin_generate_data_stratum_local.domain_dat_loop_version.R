@@ -50,14 +50,14 @@ for (rep in 1:reps) {
   #### 2. Write the ogmap files ####
   Make_patch_domain_arena_DAT(size,patches=results$patches_list$patches,the_stack=results$the_stack,percent=percent)
   
-  #### 3. Slice data file ####
-  Make_PB_fall.dat()
-  
-  #### 4. Analyse GAM ####
-  Analyse_Gam()
-  
-  #### 5. Run Comparison + Print graphs ####
-  Compare_Graph()
+  # #### 3. Slice data file ####
+  # Make_PB_fall.dat()
+  # 
+  # #### 4. Analyse GAM ####
+  # Analyse_Gam()
+  # 
+  # #### 5. Run Comparison + Print graphs ####
+  # Compare_Graph()
   
   #### 6. Return to Original WD ####
   setwd(cwd)
