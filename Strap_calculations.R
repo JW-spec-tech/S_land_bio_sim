@@ -1,4 +1,6 @@
 # Strap calculation to estimate biomass from survey data for comparison with ogmap/gam
+STRAP <- function(fname="Strap_estimate") {
+  
 
 #### Packages ####
 library(dplyr)
@@ -7,11 +9,10 @@ library(ggplot2)
 
 #### 1. Load data ####
 survey_raw_data <- readr::read_table("PB_fall.dat")
-results <- read_parquet("results")
-patches <- results$patches_list$patches
+patches <- read_parquet("patches")
+
 
 strata_area <- patches %>% 
-  st_set_geometry(.,NULL) %>% 
   dplyr::mutate(stratum=as.numeric(patch_id)) %>% 
   units::drop_units() %>% 
   dplyr::select(stratum,patch_area) 
@@ -40,20 +41,26 @@ Strap_estimate <- Survey_W_Area %>%
          upper = B_total + 1.96*B_se)
 
 
-#### 4. plot ####
+#### 4. Save the data ####
 
+# join the data 
 Strap_estimate <- dplyr::left_join(Strap_estimate,biomass_year)
+# write the data
+write_parquet(Strap_estimate,fname)
 
-data_Graph <- ggplot(Strap_estimate, aes(year))
+}
 
-CI_plot <- data_Graph +
-  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "blue", alpha=0.25)+
-  geom_line(aes(y=B_total, colour = "blue"))+
-  geom_line(aes(y=t_bio, colour = "black"))+
-  scale_color_manual(name= "Biomass", labels = c("STRAP","Real"),values = c("blue","black"))+
-  labs(title = "Coverage of Confidence Intervals
-       GAM VS OGmap", x="Year (simulation #)", y="Biomass in kg")+
-  theme(plot.title = element_text(hjust = 0.5))
-
-print(CI_plot)
+# 
+# data_Graph <- ggplot(Strap_estimate, aes(year))
+# 
+# CI_plot <- data_Graph +
+#   geom_ribbon(aes(ymin = lower, ymax = upper), fill = "blue", alpha=0.25)+
+#   geom_line(aes(y=B_total, colour = "blue"))+
+#   geom_line(aes(y=t_bio, colour = "black"))+
+#   scale_color_manual(name= "Biomass", labels = c("STRAP","Real"),values = c("blue","black"))+
+#   labs(title = "Coverage of Confidence Intervals
+#        GAM VS OGmap", x="Year (simulation #)", y="Biomass in kg")+
+#   theme(plot.title = element_text(hjust = 0.5))
+# 
+# print(CI_plot)
 
