@@ -6,6 +6,7 @@ STRAP <- function(fname="Strap_estimate") {
 library(dplyr)
 library(readr)
 library(ggplot2)
+  library(arrow)
 
 #### 1. Load data ####
 survey_raw_data <- readr::read_table("PB_fall.dat")
