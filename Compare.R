@@ -82,10 +82,10 @@ CI_plot <- data_Graph +
   geom_line(aes(y=point_est, colour = "red"))+
   geom_ribbon(aes(ymin = CI_lower_ogmap, ymax = CI_upper_ogmap), fill = "lightblue", alpha=0.5)+
   geom_line(aes(y=ogmap, colour = "lightblue"))+
-  geom_ribbon(aes(ymin = CI_STRAP_lower, ymax = CI_STRAP_upper), fill = "orange", alpha=0.25)+
-  geom_line(aes(y=STRAP, colour = "orange"))+
+  geom_ribbon(aes(ymin = CI_STRAP_lower, ymax = CI_STRAP_upper), fill = "green", alpha=0.25)+
+  geom_line(aes(y=STRAP, colour = "green"))+
   geom_line(aes(y=t_bio, colour = "black"))+
-  scale_color_manual(name= "Biomass", labels = c("Total biomass","GAM", "OGmap","STRAP"),values = c("black", "red","blue","orange"))+
+  scale_color_manual(name= "Biomass", labels = c("Total biomass","GAM", "OGmap","STRAP"),values = c("black", "green","blue","red"))+
   labs(title = "Coverage of Confidence Intervals
        GAM VS OGmap VS STRAP", x="Year (simulation #)", y="Biomass in kg")+
   theme(plot.title = element_text(hjust = 0.5))
