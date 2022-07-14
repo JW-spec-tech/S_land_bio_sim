@@ -1,4 +1,4 @@
-Make_PB_fall.dat <- function(percent_f=0.1,path="PB_fall.dat.complete",fname="PB_fall.dat"){
+Make_PB_fall.dat <- function(percent_f=0.025,path="PB_fall.dat.complete",fname="PB_fall.dat"){
   
   F_data <- arrow::read_parquet("PB_fall.dat.complete")
   
@@ -13,6 +13,8 @@ Make_PB_fall.dat <- function(percent_f=0.1,path="PB_fall.dat.complete",fname="PB
     
   propotion_strata$prop_random= ifelse(propotion_strata$prop_random<propotion_strata$min,propotion_strata$min,propotion_strata$prop_random)
   
+  hist(propotion_strata$prop_random)
+  
   F_data_prop <- dplyr::left_join(F_data,propotion_strata[,c("year","stratum","prop_random")])
   
   S_data <- F_data_prop %>% 
@@ -26,5 +28,6 @@ Make_PB_fall.dat <- function(percent_f=0.1,path="PB_fall.dat.complete",fname="PB
 # S_data <- return(S_data)
   
   write.table(S_data, file = fname,sep = " ", quote = F, row.names = F )
+  gc()
   
 }
