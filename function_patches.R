@@ -67,7 +67,7 @@ sspm_boundary <- spm_as_boundary(boundaries = Main_L_copy_rcl_clumped_sf,
                                  boundary = "bound_id")
 
 # set number of strata per area as a function of size
-nb_nodes_bound_id <- round(as.numeric(sspm_boundary@boundaries$area_bound_id/500))
+nb_nodes_bound_id <- round(as.numeric(sspm_boundary@boundaries$area_bound_id/1400))
 
 # This makes sure we sample the surface of the polygons at random points 
 voronoi <- spm_discretize(sspm_boundary, method = "tesselate_voronoi", 
