@@ -13,7 +13,7 @@ Make_PB_fall.dat <- function(percent_f=0.025,path="PB_fall.dat.complete",fname="
     
   propotion_strata$prop_random= ifelse(propotion_strata$prop_random<propotion_strata$min,propotion_strata$min,propotion_strata$prop_random)
   
-  hist(propotion_strata$prop_random)
+  # hist(propotion_strata$prop_random) # testing shows the histogram of # of trawls per strata
   
   F_data_prop <- dplyr::left_join(F_data,propotion_strata[,c("year","stratum","prop_random")])
   
