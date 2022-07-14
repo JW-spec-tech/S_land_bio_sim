@@ -20,6 +20,7 @@ biomass_year <- F_data %>%
 #Load predictions
 ogmap_estimates <- readr::read_table("biomass__Ogmap2 - Demo.log", skip = 2)
 Predictions_summary <- read_parquet("Predictions_summary")
+STRAP <- read_parquet("Strap_estimate")
 
 # gam_biomass_year <- dat_grid %>% 
 #   dplyr::group_by(year) %>% 
@@ -31,7 +32,10 @@ Predictions_summary <- read_parquet("Predictions_summary")
 comparison <- data.frame(biomass_year, Predictions_summary,
                          ogmap=(as.numeric(ogmap_estimates$Estimate)*1e3), 
                          CI_upper_ogmap= ogmap_estimates$UpCIval*1e3, 
-                         CI_lower_ogmap=ogmap_estimates$LowCIval*1e3)
+                         CI_lower_ogmap=ogmap_estimates$LowCIval*1e3,
+                         STRAP=STRAP$B_total,
+                         CI_STRAP_upper=STRAP$upper,
+                         CI_STRAP_lower=STRAP$lower)
 comparison <- comparison[ -c(3) ]
 comparison <- comparison[c(1:6,8,7)]
 
@@ -75,10 +79,12 @@ CI_plot <- data_Graph +
   geom_line(aes(y=point_est, colour = "red"))+
   geom_ribbon(aes(ymin = CI_lower_ogmap, ymax = CI_upper_ogmap), fill = "lightblue", alpha=0.5)+
   geom_line(aes(y=ogmap, colour = "lightblue"))+
+  geom_ribbon(aes(ymin = CI_STRAP_lower, ymax = CI_STRAP_upper), fill = "orange", alpha=0.25)+
+  geom_line(aes(y=point_est, colour = "orange"))+
   geom_line(aes(y=t_bio, colour = "black"))+
-  scale_color_manual(name= "Biomass", labels = c("Total biomass","GAM", "OGmap"),values = c("black", "blue","red"))+
+  scale_color_manual(name= "Biomass", labels = c("Total biomass","GAM", "OGmap","STRAP"),values = c("black", "blue","red","orange"))+
   labs(title = "Coverage of Confidence Intervals
-       GAM VS OGmap", x="Year (simulation #)", y="Biomass in kg")+
+       GAM VS OGmap VS STRAP", x="Year (simulation #)", y="Biomass in kg")+
   theme(plot.title = element_text(hjust = 0.5))
   
 ggsave(plot_name,
