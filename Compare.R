@@ -4,6 +4,7 @@ library(dplyr)
 library(mosaic)
 library(arrow)
 library(ggplot2)
+library(gridExtra)
 # Simulation stats 
 
 # Actual stats
@@ -18,7 +19,7 @@ biomass_year <- F_data %>%
 
 
 #Load predictions
-ogmap_estimates <- readr::read_table("biomass__Ogmap2 - Demo.log", skip = 2)
+ogmap_estimates <- readr::read_table("biomass__teste.log", skip = 2)
 Predictions_summary <- arrow::read_parquet("Predictions_summary")
 STRAP <- arrow::read_parquet("Strap_estimate")
 
@@ -77,22 +78,39 @@ comparison <- comparison[ -c(3) ]
 data_Graph <- ggplot(comparison, aes(year))
 
 # Create graph
-CI_plot <- data_Graph +
+colors <- c("GAM" = "red", "Ogmap" = "lightblue", "Total Biomass" = "black")
+
+CI_plot_gam_ogmap <- data_Graph +
   geom_ribbon(aes(ymin = lower, ymax = upper), fill = "red", alpha=0.25)+
-  geom_line(aes(y=point_est, colour = "red"))+
+  geom_line(aes(y=point_est, color= "GAM"))+
   geom_ribbon(aes(ymin = CI_lower_ogmap, ymax = CI_upper_ogmap), fill = "lightblue", alpha=0.5)+
-  geom_line(aes(y=ogmap, colour = "lightblue"))+
-  geom_ribbon(aes(ymin = CI_STRAP_lower, ymax = CI_STRAP_upper), fill = "green", alpha=0.25)+
-  geom_line(aes(y=STRAP, colour = "green"))+
-  geom_line(aes(y=t_bio, colour = "black"))+
-  scale_color_manual(name= "Biomass", labels = c("Total biomass","GAM", "OGmap","STRAP"),values = c("black", "green","blue","red"))+
+  geom_line(aes(y=ogmap, color = "Ogmap"))+
+  # geom_ribbon(aes(ymin = CI_STRAP_lower, ymax = CI_STRAP_upper), fill = "green", alpha=0.25)+
+  # geom_line(aes(y=STRAP), color = "green")+
+  geom_line(aes(y=t_bio, color = "Total Biomass"))+
+  scale_color_manual(name= "Biomass", labels = c("GAM","OGmap", "Total Biomass"), values = colors)+
   labs(title = "Coverage of Confidence Intervals
        GAM VS OGmap VS STRAP", x="Year (simulation #)", y="Biomass in kg")+
   theme(plot.title = element_text(hjust = 0.5))
 
-CI_plot
+colors2 <- c("STRAP" = "orange", "Total Biomass" = "black")
+
+CI_plot_Strap <- data_Graph +
+  # geom_ribbon(aes(ymin = lower, ymax = upper), fill = "red", alpha=0.25)+
+  # geom_line(aes(y=point_est), color= "red")+
+  # geom_ribbon(aes(ymin = CI_lower_ogmap, ymax = CI_upper_ogmap), fill = "lightblue", alpha=0.5)+
+  # geom_line(aes(y=ogmap), color = "lightblue")+
+  geom_ribbon(aes(ymin = CI_STRAP_lower, ymax = CI_STRAP_upper), fill = "orange", alpha=0.25)+
+  geom_line(aes(y=STRAP, color = "STRAP"))+
+  geom_line(aes(y=t_bio, color = "Total Biomass"))+
+  scale_color_manual(name= "Biomass", labels = c("STRAP","Total biomass"),values = colors2)+
+  labs(title = "Coverage of Confidence Intervals
+       STRAP", x="Year (simulation #)", y="Biomass in kg")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+grid.arrange(CI_plot_gam_ogmap,CI_plot_Strap)
   
-ggsave(plot_name,
+sggsave(plot_name,
        plot = CI_plot,
        device = "png",
        width = 24000,
