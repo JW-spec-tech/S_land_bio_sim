@@ -71,7 +71,7 @@ Resample_sims_random <- function(n,percent_f=0.025,path="PB_fall.dat.complete"){
   #how many workers are available? (optional)
   foreach::getDoParWorkers()
   
-  n=2000
+  n=100
   
   Resampling_list <- foreach(
     n = 1:n,
@@ -100,8 +100,7 @@ Resample_sims_random <- function(n,percent_f=0.025,path="PB_fall.dat.complete"){
       group_split() %>%
       purrr::map_dfr(~slice_sample(.x,n=.x$prop_random[1])) %>% 
       bind_rows() %>% 
-      mutate(biomass=rTweedie((biomass*1000), p = 1.76, phi= 2)) %>% 
-      filter(year==1991)
+      mutate(biomass=rTweedie((biomass*1000), p = 1.76, phi= 2))
     
     # store said sample
     Resampling_list[[n]] <- single_sample
@@ -114,6 +113,7 @@ Resample_sims_random <- function(n,percent_f=0.025,path="PB_fall.dat.complete"){
 parallel::stopCluster(cl = my.cluster)
 
 
+
 # Initialize list
 Resampling_list <- list()
 
@@ -121,9 +121,9 @@ Resampling_list <- list()
 Resample_list <- Resample_sims(10000)
 
 
-
+Resampling_list_complete <- list()
 # Random resampling
-Random_Resample_list <- Resample_sims_random(10,percent_f=0.1)
+Random_Resample_list <- Resample_sims_random(1,percent_f=0.1)
 
 par(mfrow=c(1,1))
 
@@ -210,6 +210,8 @@ Resample_hist <- function(data) {
   
   Sum_weighted_means <- lapply(weighted_means, function(x) as.data.table(x)[,sum(V1)/(nrow(F_data_prop)/length(F_data_prop))])
   
+ 
+  
   mean_df <- t(as.data.frame(do.call(cbind, Sum_weighted_means)))
   
   hist(mean_df, xlim = c(min(400),max(mean_df)))
@@ -220,10 +222,57 @@ Resample_hist <- function(data) {
 
 
   Resample_hist(Resampling_list)
+  
+  weighted_var <- lapply(Resampling_list_100, function(x) as.data.table(x)[,var(biomass)*n, by = list(stratum,n)])
+  
+  Sum_weighted_var <- lapply(weighted_var, function(x) as.data.table(x)[,sum(V1)/(nrow(F_data_prop)/length(F_data_prop))])
 
+  var(Resampling_list_100[[1]][["biomass"]])
+  
+  max(t(as.data.frame(do.call(cbind, Sum_weighted_var))))
 
-
-for (n in 1:length(Resampling_list)) {
+  min(t(as.data.frame(do.call(cbind, Sum_weighted_var))))
+  
+  
+  simple_gam_test_low  <- bam((biomass/1000)~te(long, lat, year, bs= c("tp","re"), d = c(2,1)), family= "tw", data = Resampling_list_100[[64]], method="REML")
+  
+  simple_gam_test_high  <- bam((biomass/1000)~te(long, lat, year, bs= c("tp","re"), d = c(2,1)), family= "tw", data = Resampling_list_100[[96]], method="REML")
+  
+  
+  
+  dat_grid_x_y <- as.data.frame(expand_grid(long=seq(0.5,499,by=1),
+                                            lat= seq(0.5,499,by=1)))
+  
+  
+  
+  
+  Get_biomass_Ci_write <- function(fit,dat_per_year=dplyr::bind_cols(dat_grid_x_y,year_f=as.factor(year))){
+    
+    year=year
+    
+    sims <- sspm:::produce_sims(fit, dat_per_year, 1000)
+    sims <- exp(sims)
+    
+    sims_total <- apply(sims, MARGIN = 2, FUN = "sum")
+    sims_point <- mean(sims_total)
+    
+    alpha = 0.05
+    sims_CI <- quantile(sims_total, prob = c(alpha/2, 1-alpha/2))
+    output <- data.frame(year=year,point_est = sims_point, lower = sims_CI[1], upper = sims_CI[2])
+    # write_parquet(output,paste0('Result/model_', year))
+    return(output)
+  }
+  
+  Gam_pred <- Get_biomass_Ci_write(simple_gam_test_low)
+  
+  dat_per_year <- dplyr::bind_cols(dat_grid_x_y,year=year) %>% 
+      dplyr::mutate(fit_simple_gam = predict.bam(simple_gam_test_low,type = "response", newdata = .))
+  
+  sum(dat_per_year$fit_simple_gam)
+  
+  sum(bio_1991_F)
+  
+  for (n in 1:length(Resampling_list)) {
   
   mean <- mean(Resampling_list[[n]][["biomass"]])
   
@@ -277,6 +326,32 @@ mean(bio_1991_F$biomass)
 
 
 
+# Plottting gams
+a <- bam((biomass/1000)~te(long, lat, year, bs= c("tp","re"), d = c(2,1)), family= "tw", data = filter(Resampling_list_100[[96]],year==1991), method="REML")
+unique(Resampling_list_100[[96]]$year)
+a <- bam((biomass/1000)~s(long, lat, bs= "tp"), family= "tw", data = filter(Resampling_list_100[[96]],year==1991), method="REML")
+plot(a,scheme=2)
+draw(a)
+library(gratia)
+install.packages("gratia")
+library(gratia)
+draw(a)
+exp(2)
+field <- raster("main_L.grd")
+View(field)
+image(field)
+View(Global_Moran)
+View(Moran_list)
+??"covariogram"
+??"covariance"
+library(RandomFields)
+b = RFcov(data = field)
+## isotropic model
+model <- RMexp()
+x <- seq(0, 10, 0.02)
+z <- RFsimulate(model, x=x, n=n)
+emp.vario <- RFcov(data=z)
+plot(emp.vario, model=model)
 
 
 
