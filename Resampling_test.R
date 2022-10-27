@@ -1,4 +1,4 @@
-#  Goal of this is to resample landscapes and creat a distribution
+#  Goal of this is to resample landscapes and create a distribution
 
 library(dplyr)
 library(arrow)
@@ -47,13 +47,12 @@ Resample_sims <- function(n,percent_f=0.025,path="PB_fall.dat.complete"){
   return(Resampling_list)
 }
 
-Resample_sims_random <- function(n,percent_f=0.025,path="PB_fall.dat.complete"){
-  
+Resample_sims_random <- function(n,percent_f=0.025,path="PB_fall.dat.complete",F_data=F_data){
   # Initialize list
-  Resampling_list <- list()
+  Resampling_list_2 <- list()
   
-  n.cores <- 10
-  my.cluster <- parallel::makeCluster(
+  n.cores <- 10                           #### Set number of CPU cores ####
+  my.cluster <- parallel::makeCluster(         #### Start cluster ####
     n.cores, 
     type = "PSOCK"
   )
@@ -71,12 +70,13 @@ Resample_sims_random <- function(n,percent_f=0.025,path="PB_fall.dat.complete"){
   #how many workers are available? (optional)
   foreach::getDoParWorkers()
   
-  n=100
+  n=10
   
-  Resampling_list <- foreach(
+  Resampling_list_2 <- foreach(
     n = 1:n,
-    .packages = c('mgcv','dplyr','purrr')
+    .packages = c('mgcv','dplyr','purrr','arrow')
   ) %dopar% {
+    F_data <- arrow::read_parquet("PB_fall.dat.complete")
     propotion_strata <- F_data %>% 
       dplyr::group_by(stratum,year) %>% 
       dplyr::summarise(n=n()) %>% 
@@ -104,21 +104,29 @@ Resample_sims_random <- function(n,percent_f=0.025,path="PB_fall.dat.complete"){
     
     # store said sample
     Resampling_list[[n]] <- single_sample
+    Resample_list[[n]]
   }
-
-  return(Resampling_list)
   parallel::stopCluster(cl = my.cluster)
 }
 
-parallel::stopCluster(cl = my.cluster)
+# Create file to store Resamples
+dir.create("Resamples")
 
-
+# Loop to make PB_fall.dat for each resampled dataset
+cwd <- getwd()
+setwd("Resamples/")
+for (n in 1:length(Resampling_list_2)) {
+  fname=paste0("PB_fall.dat",n)
+  write.table(Resampling_list_2[[n]], file = fname,sep = " ", quote = F, row.names = F )
+  
+}
+setwd(cwd)
 
 # Initialize list
 Resampling_list <- list()
 
 # Run resampling
-Resample_list <- Resample_sims(10000)
+Resample_list_test <- Resample_sims_random(30)
 
 
 Resampling_list_complete <- list()
@@ -214,14 +222,14 @@ Resample_hist <- function(data) {
   
   mean_df <- t(as.data.frame(do.call(cbind, Sum_weighted_means)))
   
-  hist(mean_df, xlim = c(min(400),max(mean_df)))
+  hist(mean_df, xlim = c(min(mean_df),max(mean_df)))
   abline(v=mean(bio_1991_F$biomass), col = "blue", lwd = 4, lty = 4)
   
   
 }
 
 
-  Resample_hist(Resampling_list)
+  Resample_hist(Resampling_list_100)
   
   weighted_var <- lapply(Resampling_list_100, function(x) as.data.table(x)[,var(biomass)*n, by = list(stratum,n)])
   
@@ -352,6 +360,40 @@ x <- seq(0, 10, 0.02)
 z <- RFsimulate(model, x=x, n=n)
 emp.vario <- RFcov(data=z)
 plot(emp.vario, model=model)
+
+
+
+
+
+
+# GaussianBLur testing
+
+
+# install.packages("spatialEco")
+# install.packages("rasterVis")
+# install.packages("rgl")
+# install.packages("rayshader")
+library(spatialEco)
+library(rasterVis)
+library(rgl)
+library(rayshader)
+
+plot3D(field)
+
+xyz <-data.frame(x=dat_grid_x_y$long,y=dat_grid_x_y$lat,y=bio_1991$biomass)
+
+field_var <- rasterFromXYZ(xyz)
+
+elmat = raster_to_matrix(field_var)
+
+#We use another one of rayshader's built-in textures:
+elmat %>%
+  sphere_shade(texture = "desert") %>%
+  add_water(detect_water(elmat), color = "desert") %>%
+  add_shadow(ray_shade(elmat, zscale = 3), 0.5) %>%
+  add_shadow(ambient_shade(elmat), 0) %>%
+  plot_3d(elmat, zscale = 10, fov = 0, theta = 135, zoom = 0.75, phi = 45, windowsize = c(1000, 800)) %>% 
+render_snapshot()
 
 
 
