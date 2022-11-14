@@ -70,7 +70,7 @@ foreach::getDoParWorkers()
 
 foreach(
   rep = 1:reps,
-  .packages = c('mgcv','dplyr','purrr','NLMR','arrow','sspm','raster','foreach','doParallel','parallelly','readr')
+  .packages = c('mgcv','dplyr','purrr','NLMR','arrow','sspm','raster','foreach','doParallel','parallelly','readr','fasterize')
 ) %dopar% {
   print(paste("Replicate #",rep))
   seeds = seed - 1 + rep
