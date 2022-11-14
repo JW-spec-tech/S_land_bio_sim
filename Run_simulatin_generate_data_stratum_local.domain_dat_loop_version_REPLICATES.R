@@ -141,6 +141,8 @@ foreach(
 #   setwd(cwd)
 #   gc()
 # }
+parallel::stopCluster(cl = main.cluster)
+
 
 print(paste("End of Sim generation @",Sys.time()))
 
