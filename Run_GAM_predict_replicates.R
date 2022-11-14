@@ -49,7 +49,7 @@ foreach::getDoParRegistered()
 #how many workers are available? (optional)
 foreach::getDoParWorkers()
 # memory.limit(n.cores*4000)
-memory.limit(300000)
+# memory.limit(300000)
 Sys.time()
 
 #### 2. Define grid size and number of years ####
@@ -60,12 +60,11 @@ c_wd <- getwd()
 replicates_gam <- function(S_year =1991) {
   
   start_year =S_year
-  # years = files <-  as.numeric(length(list.files('sim/', pattern = ".",all.files = FALSE, recursive = TRUE, full.names = TRUE)))
-  years= 50
+  years = files <-  as.numeric(length(list.files('sim/', pattern = ".",all.files = FALSE, recursive = TRUE, full.names = TRUE)))
   size = 499
   
 for (r in 1:length(list.files("Resamples/", full.names=TRUE))) {
-  dir.create(paste0("rep",r,"/Result"), recursive = T)
+  dir.create(paste0("resample_data/","rep",r,"/Result"), recursive = T)
   trawl_data <- readr::read_table(paste0("Resamples/","PB_fall.dat",r))
  print(r)
 trawl_data$year_f <- factor(trawl_data$year)
@@ -138,7 +137,7 @@ simple_gam <- foreach(
 }
 # Sys.time()
 
-save(simple_gam, file=paste0("rep",r,"/Result/gam_model.gam"))
+save(simple_gam, file=paste0("resample_data/","rep",r,"/Result/gam_model.gam"))
 
 #### Get PRedicted biomass + CI function ####
 
@@ -154,7 +153,7 @@ Get_biomass_Ci_write <- function(rep=r,fit,dat_per_year=dplyr::bind_cols(dat_gri
   alpha = 0.05
   sims_CI <- quantile(sims_total, prob = c(alpha/2, 1-alpha/2))
   output <- data.frame(year=year_f,point_est = sims_point, lower = sims_CI[1], upper = sims_CI[2])
-  write_parquet(output,paste0("rep",rep,"/Result/model_", year_f))
+  write_parquet(output,paste0("resample_data/","rep",rep,"/Result/model_", year_f))
 
 }
 
@@ -182,11 +181,8 @@ Sys.time()
 
 
 }
+  parallel::stopCluster(cl = my.cluster)
 }
-debugonce(replicates_gam)
-replicates_gam()
-parallel::stopCluster(cl = my.cluster)
-# 
 # 
 # dat_per_year <- dplyr::bind_cols(dat_grid_x_y,year=year) %>% 
 #   dplyr::mutate(fit_simple_gam = predict.bam(simple_gam,type = "response", newdata = .)) 
