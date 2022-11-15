@@ -48,7 +48,7 @@ dir.create("Data/")
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-n.cores <- reps
+n.cores <- as.numeric(Sys.getenv('OMP_NUM_THREADS'))
 main.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -93,7 +93,7 @@ foreach(
   Make_patch_domain_arena_DAT(size,patches=results$patches_list$patches,the_stack=results$the_stack,percent=percent)
   
   # #### 3. Make replicates of each rep (landscape) ####
-  Resample_sims_random(200)
+  Resample_write_PBfall(200)
   # 
   # #### 4. Run the GAM ####
   replicates_gam()
