@@ -40,7 +40,9 @@ var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher var
 
 percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
 
-dir.create("Data/")
+dir_now <- paste0("Data_",Sys.time(),"/")
+
+dir.create(dir_now)
 
 #### 1. Create and Start Cluster ####
 
@@ -76,7 +78,7 @@ foreach(
   seeds = seed - 1 + rep
   set.seed(seeds)
   cwd <- getwd()          # CURRENT dir
-  setwd("Data/")
+  setwd(dir_now)
   newdir <- paste("Run",rep,"Size",size,"seed",seeds,"nsim",sims,"Percent",percent,Sys.Date(),sep = "_")
   dir.create(newdir)     # Create new directory
   setwd(newdir) 
