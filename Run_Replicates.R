@@ -56,4 +56,5 @@ for (i in f_list) {
   Resample_write_PBfall(200)
   setwd("../")
 }
-parallel::stopCluster(cl = main.cluster)
+
+print(paste("End of Replicates @",Sys.time()))
