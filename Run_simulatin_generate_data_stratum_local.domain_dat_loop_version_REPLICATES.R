@@ -93,10 +93,10 @@ foreach(
   Make_patch_domain_arena_DAT(size,patches=results$patches_list$patches,the_stack=results$the_stack,percent=percent)
   
   # #### 3. Make replicates of each rep (landscape) ####
-  Resample_write_PBfall(200)
+  #Resample_write_PBfall(200)
   # 
   # #### 4. Run the GAM ####
-  replicates_gam()
+  #replicates_gam()
   # 
   # #### 5. Run Comparison + Print graphs ####
   # Compare_Graph()
