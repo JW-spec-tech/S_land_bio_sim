@@ -43,7 +43,7 @@ percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sa
 
 # getwd()  <-- need to be in Data folder
 
-setwd("Data/")
+setwd("Data_2022-11-17 14:07:14/")
 
 # Get files names
 f_list <- list.files()
