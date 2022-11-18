@@ -183,6 +183,34 @@ Sys.time()
 }
   parallel::stopCluster(cl = my.cluster)
 }
+
+print(paste("Start of GAM predictions @",Sys.time()))
+reps= as.numeric(Sys.getenv('REPS')) # Number of Replicates
+sims= as.numeric(Sys.getenv('SIMS')) # Number of Sims
+size= as.numeric(Sys.getenv('SIZE')) # Size of the Landscape
+seed= as.numeric(Sys.getenv('SEED')) # Starting seed
+var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher variation = increased biomass variation
+
+percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
+# List all sims
+
+# getwd()  <-- need to be in Data folder
+
+setwd("Data_2022-11-17 14:07:14/")
+
+# Get files names
+f_list <- list.files()
+
+# Load sim data
+
+for (i in f_list) {
+  print(i)
+  setwd(i)
+  replicates_gam()
+  setwd("../")
+}
+
+print(paste("End of Replicates @",Sys.time()))
 # 
 # dat_per_year <- dplyr::bind_cols(dat_grid_x_y,year=year) %>% 
 #   dplyr::mutate(fit_simple_gam = predict.bam(simple_gam,type = "response", newdata = .)) 
