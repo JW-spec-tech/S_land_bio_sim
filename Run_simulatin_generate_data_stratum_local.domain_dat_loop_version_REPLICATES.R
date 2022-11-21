@@ -40,7 +40,7 @@ var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher var
 
 percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
 
-dir_now <- paste0("Data_",Sys.time())
+dir_now <- paste0("Data")
 
 dir.create(dir_now)
 
