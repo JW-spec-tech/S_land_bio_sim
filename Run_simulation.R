@@ -72,7 +72,9 @@ foreach::getDoParWorkers()
   setwd(dir_noww)
   print(dir_noww)
 print(paste("Start of Sim generation @",Sys.time(),"TEST"))
-  
+
+print(getwd())
+
 foreach(
   rep = 1:reps,
   .packages = c('mgcv','dplyr','purrr','NLMR','arrow','sspm','raster','foreach','doParallel','parallelly','readr','fasterize')
