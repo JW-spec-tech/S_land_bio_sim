@@ -69,7 +69,8 @@ foreach::getDoParRegistered()
 #how many workers are available? (optional)
 foreach::getDoParWorkers()
 
-
+  setwd(dir_now)
+  
 foreach(
   rep = 1:reps,
   .packages = c('mgcv','dplyr','purrr','NLMR','arrow','sspm','raster','foreach','doParallel','parallelly','readr','fasterize')
@@ -78,7 +79,6 @@ foreach(
   seeds = seed - 1 + rep
   set.seed(seeds)
   cwd <- getwd()          # CURRENT dir
-  setwd(dir_now)
   newdir <- paste("Run",rep,"Size",size,"seed",seeds,"nsim",sims,"Percent",percent,Sys.Date(),sep = "_")
   dir.create(newdir)     # Create new directory
   setwd(newdir) 
