@@ -106,8 +106,13 @@ foreach(
   #### 6. Return to Original WD ####
   setwd(cwd)
   gc()
+  
+
+  
 }
 
+#### Kill the cluster
+parallel::stopCluster(cl = main.cluster)
 #### Loop to run replicates of simulations in individual folders ####
 # for (rep in 1:reps) {
 #   print(paste("Replicate #",rep))
@@ -143,7 +148,7 @@ foreach(
 #   setwd(cwd)
 #   gc()
 # }
-parallel::stopCluster(cl = main.cluster)
+
 
 
 print(paste("End of Sim generation @",Sys.time()))
