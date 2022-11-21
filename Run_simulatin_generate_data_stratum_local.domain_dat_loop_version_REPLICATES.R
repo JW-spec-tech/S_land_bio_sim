@@ -40,9 +40,9 @@ var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher var
 
 percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
 
-dir_now <- paste0("Data")
+dir_noww <- paste0("Data")
 
-dir.create(dir_now)
+dir.create(dir_noww)
 
 #### 1. Create and Start Cluster ####
 
@@ -69,7 +69,8 @@ foreach::getDoParRegistered()
 #how many workers are available? (optional)
 foreach::getDoParWorkers()
 
-  setwd(dir_now)
+  setwd(dir_noww)
+  print(dir_noww)
   
 foreach(
   rep = 1:reps,
