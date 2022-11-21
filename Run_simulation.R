@@ -40,12 +40,12 @@ var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher var
 
 percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
 
-dir_noww <- paste0("Data")
+dir_noww <- paste0("Data_test")
 
 dir.create(dir_noww)
 
 #### 1. Create and Start Cluster ####
-print(paste("Start of Sim generation @",Sys.time()),"TEST")
+print(paste("Start of Sim generation @",Sys.time(),"test"))
 
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
@@ -71,7 +71,7 @@ foreach::getDoParWorkers()
 
   setwd(dir_noww)
   print(dir_noww)
-print(paste("Start of Sim generation @",Sys.time()),"TEST")
+print(paste("Start of Sim generation @",Sys.time(),"TEST"))
   
 foreach(
   rep = 1:reps,
