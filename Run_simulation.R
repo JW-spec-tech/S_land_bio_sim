@@ -82,7 +82,6 @@ foreach(
   print(paste("Replicate #",rep))
   seeds = seed - 1 + rep
   set.seed(seeds)
-  cwd <- getwd()          # CURRENT dir
   newdir <- paste("Run",rep,"Size",size,"seed",seeds,"nsim",sims,"Percent",percent,Sys.Date(),sep = "_")
   dir.create(newdir)     # Create new directory
   setwd(newdir) 
@@ -108,7 +107,7 @@ foreach(
   # Compare_Graph()
   
   #### 6. Return to Original WD ####
-  setwd(cwd)
+  setwd("../")
   gc()
   
 
