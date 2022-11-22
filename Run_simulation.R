@@ -40,9 +40,14 @@ var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher var
 
 percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
 
-dir_noww <- paste0("Data_test")
+reps=10
+sims=10
+seed=55555
+size=500
+var=2
+percent=2
 
-dir.create(dir_noww)
+
 
 #### 1. Create and Start Cluster ####
 print(paste("Start of Sim generation @",Sys.time(),"test"))
@@ -50,7 +55,7 @@ print(paste("Start of Sim generation @",Sys.time(),"test"))
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-n.cores <- as.numeric(Sys.getenv('OMP_NUM_THREADS'))
+# n.cores <- as.numeric(Sys.getenv('OMP_NUM_THREADS'))
 main.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -69,8 +74,13 @@ foreach::getDoParRegistered()
 #how many workers are available? (optional)
 foreach::getDoParWorkers()
 
-  setwd(dir_noww)
-  print(dir_noww)
+dir_now <- paste0("Data_test")
+
+dir.create(dir_now)
+setwd("Data_test/")
+dir.create(dir_now)
+  setwd("Data_test/")
+  print(dir_now)
 print(paste("Start of Sim generation @",Sys.time(),"TEST"))
 
 print(getwd())
@@ -80,11 +90,12 @@ foreach(
   .packages = c('mgcv','dplyr','purrr','NLMR','arrow','sspm','raster','foreach','doParallel','parallelly','readr','fasterize')
 ) %dopar% {
   print(paste("Replicate #",rep))
-  seeds = seed - 1 + rep
+  seeds = seed - 10 + rep
   set.seed(seeds)
   newdir <- paste("Run",rep,"Size",size,"seed",seeds,"nsim",sims,"Percent",percent,Sys.Date(),sep = "_")
   dir.create(newdir)     # Create new directory
-  setwd(newdir) 
+  setwd(paste0(newdir,"/")) 
+  getwd()
   write.table(as.data.frame(newdir),"seed")
   #### 1. Run the sim ####
   results <- S_land_bio_sim(sims,size,variation = var) # higher variation = increased biomass variation
@@ -93,24 +104,22 @@ foreach(
   patches=results$patches_list$patches
   patches=st_set_geometry(patches,NULL)
   write_parquet(patches,"patches")
-  
+
   #### 2. Write the ogmap files ####
   Make_patch_domain_arena_DAT(size,patches=results$patches_list$patches,the_stack=results$the_stack,percent=percent)
-  
-  # #### 3. Make replicates of each rep (landscape) ####
-  #Resample_write_PBfall(200)
+
+  # # #### 3. Make replicates of each rep (landscape) ####
+  # #Resample_write_PBfall(200)
+  # # 
+  # # #### 4. Run the GAM ####
+  # #replicates_gam()
+  # # 
+  # # #### 5. Run Comparison + Print graphs ####
+  # # Compare_Graph()
   # 
-  # #### 4. Run the GAM ####
-  #replicates_gam()
-  # 
-  # #### 5. Run Comparison + Print graphs ####
-  # Compare_Graph()
-  
-  #### 6. Return to Original WD ####
+  # #### 6. Return to Original WD ####
   setwd("../")
   gc()
-  
-
   
 }
 
