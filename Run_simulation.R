@@ -78,8 +78,8 @@ dir_now <- paste0("Data_test")
 
 dir.create(dir_now)
 setwd("Data_test/")
-dir.create(dir_now)
-  setwd("Data_test/")
+# dir.create(dir_now)
+#   setwd("Data_test/")
   print(dir_now)
 print(paste("Start of Sim generation @",Sys.time(),"TEST"))
 
