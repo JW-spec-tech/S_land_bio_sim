@@ -25,8 +25,9 @@ library(kableExtra)
 source(file = "Simulation_Depth_Temp_Coordinates_Biomass_function_V2.R")
 source(file = "function_patches.R")
 source(file = "Make_local.domain_local.arena.R")
-#source(file = "Resampling_test.R")
-#source(file = "Run_GAM_predict_replicates.R")
+source(file = "Strap_calculations.R")
+# source(file = "Resampling_test.R")
+# source(file = "Run_GAM_predict_replicates.R")
 
 
 
@@ -40,14 +41,6 @@ var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher var
 
 percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
 
-reps=10
-sims=10
-seed=55555
-size=500
-var=2
-percent=2
-
-
 
 #### 1. Create and Start Cluster ####
 print(paste("Start of Sim generation @",Sys.time(),"test"))
@@ -55,7 +48,7 @@ print(paste("Start of Sim generation @",Sys.time(),"test"))
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-# n.cores <- as.numeric(Sys.getenv('OMP_NUM_THREADS'))
+n.cores <- as.numeric(Sys.getenv('OMP_NUM_THREADS'))
 main.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -104,20 +97,19 @@ foreach(
   patches=results$patches_list$patches
   patches=st_set_geometry(patches,NULL)
   write_parquet(patches,"patches")
-
+  gc()
+  
   #### 2. Write the ogmap files ####
   Make_patch_domain_arena_DAT(size,patches=results$patches_list$patches,the_stack=results$the_stack,percent=percent)
-
-  # # #### 3. Make replicates of each rep (landscape) ####
-  # #Resample_write_PBfall(200)
-  # # 
-  # # #### 4. Run the GAM ####
-  # #replicates_gam()
-  # # 
-  # # #### 5. Run Comparison + Print graphs ####
-  # # Compare_Graph()
-  # 
-  # #### 6. Return to Original WD ####
+  gc()
+  
+  #### 3. Slice data file ####
+  Make_PB_fall.dat()
+  gc()
+  
+  #### 4. Run STRAP calculations ####
+  STRAP()
+  
   setwd("../")
   gc()
   
