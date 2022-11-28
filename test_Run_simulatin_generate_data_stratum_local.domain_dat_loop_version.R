@@ -67,37 +67,38 @@ Sys.time()
   ) %dopar% {
     #### 0. Set-up ####
   print(paste("Replicate #",rep,Sys.time()))
-  seeds = seed - 1 + rep
+  seeds = seed + rep
   set.seed(seeds)
-  cwd <- getwd()          # CURRENT dir
-  setwd("Data/")
+  cwd <- "Data_test"          # CURRENT dir
+  # setwd("Data/")
   newdir <- paste("Run",rep,"Size",size,"seed",seeds,"nsim",sims,"Percent",percent,Sys.Date(),sep = "_")
-  dir.create(newdir)     # Create new directory
-  setwd(newdir) 
-  write.table(as.data.frame(newdir),"seed")
+  dir.create(paste0(cwd,"/",newdir))    # Create new directory
+  cwd <- paste0(cwd,"/",newdir)
+  # setwd(newdir) 
+  write.table(as.data.frame(newdir),paste0(cwd,"/","seed"))
   
   #### 1. Run the sim ####
   
   results <- S_land_bio_sim(sims,size,variation = var) # higher variation = increased biomass variation
   
-  # Save size of each strata
-  patches=results$patches_list$patches
-  patches=st_set_geometry(patches,NULL)
-  write_parquet(patches,"patches")
-  gc()
-  
-  #### 2. Write the ogmap files ####
-  Make_patch_domain_arena_DAT(size,patches=results$patches_list$patches,the_stack=results$the_stack,percent=percent)
-  gc()
-  
-  #### 3. Slice data file ####
-  Make_PB_fall.dat()
-  gc()
-  
-  #### 4. Run STRAP calculations ####
-  STRAP()
-  
-  setwd(cwd)
+  # # Save size of each strata
+  # patches=results$patches_list$patches
+  # patches=st_set_geometry(patches,NULL)
+  # write_parquet(patches,"patches")
+  # gc()
+  # 
+  # #### 2. Write the ogmap files ####
+  # Make_patch_domain_arena_DAT(size,patches=results$patches_list$patches,the_stack=results$the_stack,percent=percent)
+  # gc()
+  # 
+  # #### 3. Slice data file ####
+  # Make_PB_fall.dat()
+  # gc()
+  # 
+  # #### 4. Run STRAP calculations ####
+  # STRAP()
+  # 
+  # setwd(cwd)
   gc()
 }
 
