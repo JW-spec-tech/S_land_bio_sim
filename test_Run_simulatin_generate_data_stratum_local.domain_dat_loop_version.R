@@ -22,25 +22,25 @@ source(file = "Resampling_test.R")
 
 # memory.limit(40000)
 
-reps=2
-sims=10
-size=500
-seed=round(runif(1,0,1000000))
-var=1.5
-percent=2
+# reps=6
+# sims=10
+# size=500
+# seed=round(runif(1,0,1000000))
+# var=1.5
+# percent=2
 
 print(paste("Start of Sim generation @",Sys.time()))
-# reps= as.numeric(Sys.getenv('REPS')) # Number of Replicates
-# sims= as.numeric(Sys.getenv('SIMS')) # Number of Sims
-# size= as.numeric(Sys.getenv('SIZE')) # Size of the Landscape
-# seed= as.numeric(Sys.getenv('SEED')) # Starting seed
-# var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher variation = increased biomass variation
+reps= as.numeric(Sys.getenv('REPS')) # Number of Replicates
+sims= as.numeric(Sys.getenv('SIMS')) # Number of Sims
+size= as.numeric(Sys.getenv('SIZE')) # Size of the Landscape
+seed= as.numeric(Sys.getenv('SEED')) # Starting seed
+var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher variation = increased biomass variation
 
-# percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
+percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
 
 #### create the cluster ####
 
-  n.cores <- 5
+  n.cores <- as.numeric(Sys.getenv('OMP_NUM_THREADS'))
   my.cluster <- parallel::makeCluster(
     n.cores, 
     type = "PSOCK"
@@ -63,7 +63,7 @@ Sys.time()
 #### Loop to run replicates of simulations in individual folders ####
   Sim_Loop <- foreach(
     rep = 1:reps,
-    .packages = c('arrow','NLMR','sf','raster','fasterize','sspm','rgeos','tidyr','readr','dplyr','erer')
+    .packages = c('arrow','NLMR','sf','raster','fasterize','sspm','rgeos','tidyr','readr','erer',"mgcv", "plyr", "dplyr", "raster","landscapetools","devtools","openxlsx","sspm")
   ) %dopar% {
     #### 0. Set-up ####
   print(paste("Replicate #",rep,Sys.time()))
@@ -79,7 +79,7 @@ Sys.time()
   
   #### 1. Run the sim ####
   
-  results <- S_land_bio_sim(sims,size,variation = var) # higher variation = increased biomass variation
+  results <- S_land_bio_sim(n=sims, size=size,variation = var) # higher variation = increased biomass variation
   
   # # Save size of each strata
   # patches=results$patches_list$patches
@@ -106,4 +106,4 @@ print(paste("End of Sim generation @",Sys.time()))
 
 stopCluster(my.cluster)
 
-# ################################################
+# END ################################################

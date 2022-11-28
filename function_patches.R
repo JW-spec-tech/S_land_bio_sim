@@ -2,12 +2,13 @@ make_patches <- function(patch){ #,plot=F
    
   # patch <- raster("main_L.gri")
   
-  Main_L_copy <- patch
+  Main_L_copy_smt <- patch
 
-# Smooth the raster
+# Smooth the raster 
+  #####Removed this step #######
 
-Main_L_copy_smt <- focal(Main_L_copy, w=matrix(1,9,9), fun=mean, pad = TRUE,
-                         na.rm = TRUE)
+# Main_L_copy_smt <- raster::focal(Main_L_copy, w=matrix(1,9,9), pad = TRUE,
+                         # na.rm = TRUE)
 
 # Reclass the raster
 # ?reclassify
@@ -67,7 +68,7 @@ sspm_boundary <- spm_as_boundary(boundaries = Main_L_copy_rcl_clumped_sf,
                                  boundary = "bound_id")
 
 # set number of strata per area as a function of size
-nb_nodes_bound_id <- round(as.numeric(sspm_boundary@boundaries$area_bound_id/1400))
+nb_nodes_bound_id <- round(as.numeric(sspm_boundary@boundaries$area_bound_id/2500))
 
 # This makes sure we sample the surface of the polygons at random points 
 voronoi <- spm_discretize(sspm_boundary, method = "tesselate_voronoi", 

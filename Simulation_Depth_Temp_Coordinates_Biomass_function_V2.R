@@ -1,4 +1,4 @@
-S_land_bio_sim <- function(cwd=cwd,n,size,roughness=0.6,variation=1.5){
+S_land_bio_sim <- function(c_wd=cwd,n,size,roughness=0.6,variation=1.5){
   y=size
   x=size
 
@@ -71,7 +71,7 @@ S_land_bio_sim <- function(cwd=cwd,n,size,roughness=0.6,variation=1.5){
   # landscapetools::show_landscape(Main_L_copy) # visualize main ladnscape
   value <- Main_L_copy@data@values # get main landscape depths
   
-  writeRaster(Main_L_copy,paste0(cwd,"/","main_L"),overwrite=TRUE)
+  writeRaster(Main_L_copy,paste0(c_wd,"/","main_L"),overwrite=TRUE)
   # Make sub landscapes depths
   for(i in 1:n){
     Sub_L_M[[i]]@data@values <- (Sub_L_M[[i]]@data@values*1126)+58
@@ -87,7 +87,7 @@ S_land_bio_sim <- function(cwd=cwd,n,size,roughness=0.6,variation=1.5){
   
   
   # read real data
-  real <- read.csv("../../trawl_nl.csv")
+  real <- read.csv("trawl_nl.csv")
   
   # Generate gam based on real depth and temp
   gam_depth_sim <- gam(temp_bottom ~ s(sqrt(depth), bs="ad"), data = real)
@@ -201,10 +201,10 @@ S_land_bio_sim <- function(cwd=cwd,n,size,roughness=0.6,variation=1.5){
   }
   
   #write the files individually
-  dir.create("sim")
+  dir.create(paste0(c_wd,"/","sim"))
   for (i in 1:n) {
     k=paste0("item:",i)
-    write_parquet(sim[[k]],paste0(cwd,"/","sim/sim",i))
+    write_parquet(sim[[k]],paste0(c_wd,"/","sim/sim",i))
   }
   message("7. Assemble and store the data")
   return(list(the_stack=the_stack,patches_list=patches_list))
