@@ -1,5 +1,5 @@
 # Strap calculation to estimate biomass from survey data for comparison with ogmap/gam
-STRAP <- function(fname="Strap_estimate") {
+STRAP <- function(fname="Strap_estimate",c_wd=cwd) {
   
 
 #### Packages ####
@@ -9,8 +9,8 @@ library(ggplot2)
   library(arrow)
 
 #### 1. Load data ####
-survey_raw_data <- readr::read_table("PB_fall.dat")
-patches <- read_parquet("patches")
+survey_raw_data <- readr::read_table(paste0(c_wd,"/","PB_fall.dat"))
+patches <- read_parquet(paste0(c_wd,"/","patches"))
 
 
 strata_area <- patches %>% 
@@ -47,7 +47,7 @@ Strap_estimate <- Survey_W_Area %>%
 # join the data 
 Strap_estimate <- dplyr::left_join(Strap_estimate,biomass_year)
 # write the data
-write_parquet(Strap_estimate,fname)
+write_parquet(Strap_estimate,paste0(c_wd,"/",fname))
 
 }
 
