@@ -1,6 +1,6 @@
-Make_PB_fall.dat <- function(percent_f=0.025,path="PB_fall.dat.complete",fname="PB_fall.dat"){
+Make_PB_fall.dat <- function(percent_f=0.025,path="PB_fall.dat.complete",fname="PB_fall.dat",c_wd=cwd){
   
-  F_data <- arrow::read_parquet("PB_fall.dat.complete")
+  F_data <- arrow::read_parquet(paste0(c_wd,"/","PB_fall.dat.complete"))
   
   propotion_strata <- F_data %>% 
                       dplyr::group_by(stratum,year) %>% 
@@ -20,14 +20,16 @@ Make_PB_fall.dat <- function(percent_f=0.025,path="PB_fall.dat.complete",fname="
   S_data <- F_data_prop %>% 
     group_by(stratum,year)  %>% 
   group_split() %>%
-    purrr::map_dfr(~slice_sample(.x,n=.x$prop_random[1])) %>% 
+    purrr::map_dfr(~slice_sample(.x,n=.x$prop_random[1], replace = T)) %>% 
     bind_rows() %>% 
    mutate(biomass=rTweedie((biomass*1000), p = 1.76, phi= 2))
     
  
 # S_data <- return(S_data)
   
-  write.table(S_data, file = fname,sep = " ", quote = F, row.names = F )
+  write.table(S_data, file = paste0(c_wd,"/",fname),sep = " ", quote = F, row.names = F )
   gc()
   
 }
+
+

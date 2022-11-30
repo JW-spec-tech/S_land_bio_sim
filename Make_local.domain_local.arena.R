@@ -1,5 +1,5 @@
 
-Make_patch_domain_arena_DAT <- function(size,patches,the_stack,percent){
+Make_patch_domain_arena_DAT <- function(size=sizes,patches,the_stack,percent,c_wd=cwd){
   # Generating areas
   
   patches_area <- patches %>% 
@@ -84,8 +84,8 @@ Make_patch_domain_arena_DAT <- function(size,patches,the_stack,percent){
   
   local.domain <- round_df(local.domain,4)
   
-  write.table(local.domain, file = "local.domain",sep = " ", quote = F, row.names = F )
-  write.table(local.domain, file = "local.arena",sep = " ", quote = F, row.names = F )
+  write.table(local.domain, file = paste0(c_wd,"/","local.domain"),sep = " ", quote = F, row.names = F )
+  write.table(local.domain, file = paste0(c_wd,"/","local.arena"),sep = " ", quote = F, row.names = F )
   
   
   
@@ -95,14 +95,15 @@ Make_patch_domain_arena_DAT <- function(size,patches,the_stack,percent){
   # 1. Get all simulation data
   
   # Get files names
-  f_list <- list.files("sim/")
+  f_list <- list.files(paste0(c_wd,"/","sim"))
   
   # Load sim data
   output <- list()
   for (i in f_list) {
     
-    output[[i]] <- read_parquet(file = paste0("sim/",i))
+    output[[i]] <- read_parquet(file = paste0(c_wd,"/","sim","/",i))
   }
+
   
   
   # Write sim data
@@ -113,6 +114,7 @@ Make_patch_domain_arena_DAT <- function(size,patches,the_stack,percent){
       year=   rep(1990+as.numeric(substring(i,4)),((size-1)^2)),
       lat =   output[[i]][["coord.x"]],
       long =  output[[i]][["coord.y"]],
+      temp =  output[[i]][["temp"]],
       depth = output[[i]][["depth"]],
       NAFO =  rep("3K", ((size-1)^2)),
       sfa =   rep(6,((size-1)^2)),
@@ -125,5 +127,5 @@ Make_patch_domain_arena_DAT <- function(size,patches,the_stack,percent){
   df <- round_df(df,4)
   
   #write.table(df, file = "PB_fall.dat.complete",sep = " ", quote = F, row.names = F )
-  write_parquet(df, "PB_fall.dat.complete")
+  write_parquet(df, paste0(c_wd,"/","PB_fall.dat.complete"))
   }

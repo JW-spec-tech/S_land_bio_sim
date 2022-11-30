@@ -89,7 +89,7 @@ trawl_data$year_f <- factor(trawl_data$year)
 simple_gam <<- list()
 
 #define number of data frames to split into
-split=5
+split=1
 n_chunk <- length(dat_grid_year)/split
 #split data frame into groups per year
 split_data <- trawl_data %>% 
@@ -123,7 +123,7 @@ simple_gam <- foreach(
 ) %dopar% {
   print(n_chunk)
   chunk <- split_data[(((n_chunk-1)*split)+1):(n_chunk*split)] %>% reduce(full_join)
-  simple_gam[[n_chunk]]  <- bam((biomass/1000)~te(long, lat, year_f, bs= c("tp","re"), d = c(2,1)), family= "tw", data = chunk, method="REML")
+  simple_gam[[n_chunk]]  <- bam((biomass/1000)~te(long, lat, year, bs= c("tp","re"), d = c(2,1)), family= "tw", data = chunk, method="REML")
   gc()
   return(simple_gam[[n_chunk]])
 }

@@ -2,6 +2,7 @@ make_patches <- function(patch){ #,plot=F
    
   # patch <- raster("main_L.gri")
   
+  Main_L_copy <- patch
   Main_L_copy_smt <- patch
 
 # Smooth the raster 
