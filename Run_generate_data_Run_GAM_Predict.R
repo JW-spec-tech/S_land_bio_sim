@@ -66,7 +66,7 @@ percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sa
 #### Loop to run replicates of simulations in individual folders ####
   Sim_Loop <- foreach(
     rep = 1:reps,
-    .packages = c('arrow','NLMR','sf','raster','fasterize','sspm','rgeos','tidyr','readr','erer',"mgcv", "plyr", "dplyr", "raster","landscapetools","devtools","openxlsx","sspm")
+    .packages = c('arrow','NLMR','sf','raster','fasterize','sspm','rgeos','tidyr','readr',"mgcv", "plyr", "dplyr", "raster","landscapetools","devtools","openxlsx","sspm")
   ) %dopar% {
     #### 0. Set-up ####
   print(paste("Replicate #",rep,Sys.time()))
