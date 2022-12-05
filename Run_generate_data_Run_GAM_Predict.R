@@ -20,6 +20,7 @@ source(file = "function_patches.R")
 source(file = "Make_local.domain_local.arena.R")
 source(file = "Make_PB_fall.dat.R")
 source(file = "Resampling_test.R")
+source(file = "Strap_calculations.R")
 
 # memory.limit(40000)
 
@@ -99,7 +100,7 @@ percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sa
   gc()
   # 
   #### 4. Run STRAP Calculations ####
-  # STRAP()
+  STRAP()
 
   # setwd(cwd)
   gc()
