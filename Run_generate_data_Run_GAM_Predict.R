@@ -99,7 +99,7 @@ percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sa
   gc()
   # 
   #### 4. Run STRAP Calculations ####
-  STRAP()
+  # STRAP()
 
   # setwd(cwd)
   gc()
