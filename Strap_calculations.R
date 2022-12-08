@@ -9,6 +9,18 @@ library(ggplot2)
   library(arrow)
 
 #### 1. Load data ####
+  F_data <- read_parquet(paste0(c_wd,"/PB_fall.dat.complete"))
+  # write.table(F_data, "test.table")
+  # read_parquet("PB_fall.dat.complete")
+  # readr::read_table("test.table")
+  
+  
+  biomass_year <- F_data %>%
+    dplyr::group_by(year) %>%
+    dplyr::select(biomass,year) %>%
+    dplyr::summarise(t_bio=sum(biomass)
+    )
+  
 survey_raw_data <- readr::read_table(paste0(c_wd,"/","PB_fall.dat"))
 patches <- read_parquet(paste0(c_wd,"/","patches"))
 
