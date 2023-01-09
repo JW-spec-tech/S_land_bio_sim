@@ -89,7 +89,7 @@ trawl_data$year_f <- factor(trawl_data$year)
 simple_gam <<- list()
 
 #define number of data frames to split into
-split=1
+split=5
 n_chunk <- length(dat_grid_year)/split
 #split data frame into groups per year
 split_data <- trawl_data %>% 
@@ -123,7 +123,7 @@ simple_gam <- foreach(
 ) %dopar% {
   print(n_chunk)
   chunk <- split_data[(((n_chunk-1)*split)+1):(n_chunk*split)] %>% reduce(full_join)
-  simple_gam[[n_chunk]]  <- bam((biomass/1000)~te(long, lat, year, bs= c("tp","re"), d = c(2,1)), family= "tw", data = chunk, method="REML")
+  simple_gam[[n_chunk]]  <- bam((biomass/1000)~te(long, lat, year, bs= c("tp","tp"), d = c(2,1)), family= "tw", data = chunk, method="REML")
   gc()
   return(simple_gam[[n_chunk]])
 }
@@ -137,7 +137,7 @@ Get_biomass_Ci_write <- function(fit,dat_per_year=dplyr::bind_cols(dat_grid_x_y,
   
   year=year
   
-  sims <- sspm:::produce_sims(fit, dat_per_year, 1000)
+  sims <- sspm:::produce_sims(simple_gam[[1]], dat_per_year, 1000)
   sims <- exp(sims)
   
   sims_total <- apply(sims, MARGIN = 2, FUN = "sum")
@@ -146,7 +146,7 @@ Get_biomass_Ci_write <- function(fit,dat_per_year=dplyr::bind_cols(dat_grid_x_y,
   alpha = 0.05
   sims_CI <- quantile(sims_total, prob = c(alpha/2, 1-alpha/2))
   output <- data.frame(year=year,point_est = sims_point, lower = sims_CI[1], upper = sims_CI[2])
-  write_parquet(output,paste0('Result/model_', year))
+  write_parquet(output,paste0('Results/model_', year))
   return(output)
 }
 
