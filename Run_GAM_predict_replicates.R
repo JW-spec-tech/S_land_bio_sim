@@ -22,7 +22,7 @@ library(dplyr)
 #   install.packages(packages[!installed_packages])
 # }
 
-Size= as.numeric(Sys.getenv('SIZE')) # Get size of Landscape
+Size= 100 # Get size of Landscape
 
 #### 1. Create and Start Cluster ####
 
@@ -30,7 +30,7 @@ Size= as.numeric(Sys.getenv('SIZE')) # Get size of Landscape
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-  n.cores <- as.numeric(Sys.getenv('OMP_NUM_THREADS'))
+  n.cores <- 9
   my.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -56,17 +56,19 @@ Sys.time()
 
 
 
-c_wd <- getwd()
+getwd()
 replicates_gam <- function(S_year =1991) {
   
   start_year =S_year
-  years = files <-  as.numeric(length(list.files('sim/', pattern = ".",all.files = FALSE, recursive = TRUE, full.names = TRUE)))
+  years = files <-  20
   size = 499
   
-for (r in 1:length(list.files("Resamples/", full.names=TRUE))) {
-  dir.create(paste0("resample_data/","rep",r,"/Result"), recursive = T)
-  trawl_data <- readr::read_table(paste0("Resamples/","PB_fall.dat",r))
- print(r)
+for (r in list.dirs(full.names = T,recursive = F)) {
+  
+  print(r)
+  setwd(r)
+  trawl_data <- readr::read_table("PB_fall.dat")
+  
 trawl_data$year_f <- factor(trawl_data$year)
 #Filtering 
 # trawl_data <- trawl_data[trawl_data$year %in% 1991:2000,]
@@ -131,18 +133,20 @@ simple_gam <- foreach(
   n_chunk = 1:n_chunk,
   .packages = c('mgcv','dplyr','purrr')
 ) %dopar% {
-  chunk <- split_data[(((n_chunk-1)*split)+1):(n_chunk*split)] %>% reduce(full_join)
+  chunk <- split_data[(((n_chunk-1)*split)+1):(n_chunk*split)] %>% reduce(full_join) %>% na.omit()
   simple_gam[[n_chunk]]  <- bam((biomass/1000)~te(long, lat, year_f, bs= c("tp","re"), d = c(2,1)), family= "tw", data = chunk, method="REML")
   simple_gam[[n_chunk]]
 }
 # Sys.time()
 
-save(simple_gam, file=paste0("resample_data/","rep",r,"/Result/gam_model.gam"))
+# save(simple_gam, file=paste0("resample_data/","rep",r,"/Result/gam_model.gam"))
 
 #### Get PRedicted biomass + CI function ####
 
+dir.create("Results")
+
 print("#### Get PRedicted biomass + CI function ####")
-Get_biomass_Ci_write <- function(rep=r,fit,dat_per_year=dplyr::bind_cols(dat_grid_x_y,year_f=as.factor(year_f),year=year_f)){
+Get_biomass_Ci_write <- function(rep=r,fit,dat_per_year=dplyr::bind_cols(dat_grid_x_y,year_f=as.factor(year_f)),year=year_f){
   
   sims <- sspm:::produce_sims(fit, dat_per_year, 1000)
   sims <- exp(sims)
@@ -153,7 +157,7 @@ Get_biomass_Ci_write <- function(rep=r,fit,dat_per_year=dplyr::bind_cols(dat_gri
   alpha = 0.05
   sims_CI <- quantile(sims_total, prob = c(alpha/2, 1-alpha/2))
   output <- data.frame(year=year_f,point_est = sims_point, lower = sims_CI[1], upper = sims_CI[2])
-  write_parquet(output,paste0("resample_data/","rep",rep,"/Result/model_", year_f))
+  write_parquet(output,paste0("Results/model_",year_f))
 
 }
 
@@ -173,6 +177,9 @@ x <- foreach(
       gc()
   }
 }
+
+getwd()
+setwd("../")
 Sys.time()
 
 #### Stop Cluster ####
@@ -181,22 +188,10 @@ Sys.time()
 
 
 }
-  parallel::stopCluster(cl = my.cluster)
+
 }
 
-print(paste("Start of GAM predictions @",Sys.time()))
-reps= as.numeric(Sys.getenv('REPS')) # Number of Replicates
-sims= as.numeric(Sys.getenv('SIMS')) # Number of Sims
-size= as.numeric(Sys.getenv('SIZE')) # Size of the Landscape
-seed= as.numeric(Sys.getenv('SEED')) # Starting seed
-var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher variation = increased biomass variation
 
-percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
-# List all sims
-
-# getwd()  <-- need to be in Data folder
-
-setwd("Data_2022-11-17 14:07:14/")
 
 # Get files names
 f_list <- list.files()
@@ -211,6 +206,9 @@ for (i in f_list) {
 }
 
 print(paste("End of Replicates @",Sys.time()))
+
+parallel::stopCluster(cl = my.cluster)
+
 # 
 # dat_per_year <- dplyr::bind_cols(dat_grid_x_y,year=year) %>% 
 #   dplyr::mutate(fit_simple_gam = predict.bam(simple_gam,type = "response", newdata = .)) 

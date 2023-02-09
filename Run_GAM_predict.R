@@ -114,8 +114,9 @@ split_data <- trawl_data %>%
 #   simple_gam[[n_chunk]]  <- bam((biomass/1000)~te(long, lat, year_f, bs= c("tp","re"), d = c(2,1)), family= "tw", data = chunk, method="REML")
 # }
 # 
+library(tictoc)
 
-
+tictoc::tic()
 # Sys.time()
 simple_gam <- foreach(
   n_chunk = 1:n_chunk,
@@ -127,6 +128,7 @@ simple_gam <- foreach(
   gc()
   return(simple_gam[[n_chunk]])
 }
+tictoc::toc()
 # Sys.time()
 
 
