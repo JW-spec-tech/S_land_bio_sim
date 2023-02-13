@@ -30,7 +30,7 @@ Size= 500 # Get size of Landscape
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-  n.cores <- 2
+  n.cores <- 10
   my.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -105,6 +105,7 @@ split=5
 n_chunk <- length(dat_grid_year)/split
 #split data frame into groups per year
 split_data <- trawl_data %>% 
+  na.omit() %>% 
   group_split(year)
 
 # for (n_chunk in 1:n_chunk) {
@@ -128,19 +129,19 @@ split_data <- trawl_data %>%
 # 
 
 
-# Sys.time()
+Sys.time()
 
 simple_gam <- foreach(
   n_chunk = 1:n_chunk,
   .packages = c('mgcv','dplyr','purrr')
 ) %dopar% {
   chunk <- split_data[(((n_chunk-1)*split)+1):(n_chunk*split)] %>% reduce(full_join) %>% na.omit()
-  simple_gam[[n_chunk]]  <- bam((biomass/1000)~te(long, lat, year_f, bs= c("tp","re"), d = c(2,1)), family= "tw", data = chunk, method="REML")
+  simple_gam[[n_chunk]]  <- gam((biomass/1000)~te(long, lat, year_f, bs= c("tp","re"), d = c(2,1)), family= "tw", data = chunk, method="REML")
   simple_gam[[n_chunk]]
 }
  Sys.time()
 
-# save(simple_gam, file=paste0("resample_data/","rep",r,"/Result/gam_model.gam"))
+  # save(simple_gam, file=paste0("resample_data/","rep",r,"/Result/gam_model.gam"))
 
 #### Get PRedicted biomass + CI function ####
 
