@@ -22,7 +22,7 @@ library(dplyr)
 #   install.packages(packages[!installed_packages])
 # }
 
-Size= 100 # Get size of Landscape
+Size= 500 # Get size of Landscape
 
 #### 1. Create and Start Cluster ####
 
@@ -30,7 +30,7 @@ Size= 100 # Get size of Landscape
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-  n.cores <- 9
+  n.cores <- 2
   my.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -63,10 +63,11 @@ replicates_gam <- function(S_year =1991) {
   years = files <-  20
   size = 499
   
-for (r in list.dirs(full.names = T,recursive = F)) {
-  
-  print(r)
-  setwd(r)
+for (cwd in list.dirs(full.names = T,recursive = F)) {
+
+  print(cwd)
+  setwd(cwd)
+  cwd=getwd()
   trawl_data <- readr::read_table("PB_fall.dat")
   
 trawl_data$year_f <- factor(trawl_data$year)
@@ -137,7 +138,7 @@ simple_gam <- foreach(
   simple_gam[[n_chunk]]  <- bam((biomass/1000)~te(long, lat, year_f, bs= c("tp","re"), d = c(2,1)), family= "tw", data = chunk, method="REML")
   simple_gam[[n_chunk]]
 }
-# Sys.time()
+ Sys.time()
 
 # save(simple_gam, file=paste0("resample_data/","rep",r,"/Result/gam_model.gam"))
 
@@ -146,9 +147,8 @@ simple_gam <- foreach(
 dir.create("Results")
 
 print("#### Get PRedicted biomass + CI function ####")
-Get_biomass_Ci_write <- function(rep=r,fit,dat_per_year=dplyr::bind_cols(dat_grid_x_y,year_f=as.factor(year_f)),year=year_f){
-  
-  sims <- sspm:::produce_sims(fit, dat_per_year, 1000)
+Get_biomass_Ci_write <- function(c_wd=cwd,rep=r,fit,dat_per_year=dplyr::bind_cols(dat_grid_x_y,year_f=as.factor(year_f)),year=year_f){
+  sims <- sspm:::produce_sims(fit, dat_per_year, 100)
   sims <- exp(sims)
   
   sims_total <- apply(sims, MARGIN = 2, FUN = "sum")
@@ -156,8 +156,8 @@ Get_biomass_Ci_write <- function(rep=r,fit,dat_per_year=dplyr::bind_cols(dat_gri
   
   alpha = 0.05
   sims_CI <- quantile(sims_total, prob = c(alpha/2, 1-alpha/2))
-  output <- data.frame(year=year_f,point_est = sims_point, lower = sims_CI[1], upper = sims_CI[2])
-  write_parquet(output,paste0("Results/model_",year_f))
+  output <- data.frame(year=year,point_est = sims_point, lower = sims_CI[1], upper = sims_CI[2])
+  write_parquet(output,paste0(c_wd,"/Results/model_",year))
 
 }
 
@@ -194,15 +194,15 @@ Sys.time()
 
 
 # Get files names
-f_list <- list.files()
-
+  f_list <- paste0(getwd(),"/",list.dirs(path = "exp", full.names = TRUE, recursive = F))
+  
 # Load sim data
 
 for (i in f_list) {
   print(i)
   setwd(i)
   replicates_gam()
-  setwd("../")
+  setwd("~/Git projects/S_land_bio_sim")
 }
 
 print(paste("End of Replicates @",Sys.time()))

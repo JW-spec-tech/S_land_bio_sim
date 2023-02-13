@@ -22,10 +22,11 @@ library(kableExtra)
 
 
 #### Load the Functions ####
-source(file = "Simulation_Depth_Temp_Coordinates_Biomass_function_V3_yearly_replicate.R")
+source(file = "Simulation_Depth_Temp_Coordinates_Biomass_function_V2.R")
 source(file = "function_patches.R")
 source(file = "Make_local.domain_local.arena.R")
 source(file = "Strap_calculations.R")
+source(file = "Make_PB_fall.dat.R")
 # source(file = "Resampling_test.R")
 # source(file = "Run_GAM_predict_replicates.R")
 
@@ -40,6 +41,7 @@ seed= as.numeric(Sys.getenv('SEED')) # Starting seed
 var = as.numeric(Sys.getenv('VAR'))  # Variation in biomass field --> higher variation = increased biomass variation
 percent = as.numeric(Sys.getenv('PERCENT')) # Sets sampling percentage of the sampling of the entire dataset
 
+memory.limit(20000)
 
 print(paste("Start of Sim generation @",Sys.time(),"test"))
 reps= 5
@@ -58,7 +60,7 @@ print(paste("Start of Sim generation @",Sys.time(),"test"))
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-n.cores <- 9
+n.cores <- 8
 main.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -77,7 +79,7 @@ foreach::getDoParRegistered()
 #how many workers are available? (optional)
 foreach::getDoParWorkers()
 
-dir_now <- paste0("~/Git/S_land_bio_sim/Experiment_variation_500/Data_test_v2_var_",var)
+dir_now <- paste0("~/Git projects/S_land_bio_sim/exp/Experiment_Variation_",var)
 
 dir.create(dir_now)
 setwd(paste0(dir_now,"/"))
@@ -130,7 +132,7 @@ foreach(
 #### Kill the cluster
 parallel::stopCluster(cl = main.cluster)
 
-setwd("~/Git/S_land_bio_sim")
+setwd("~/Git projects/S_land_bio_sim")
 
 
 
@@ -151,7 +153,7 @@ print(paste("Start of Sim generation @",Sys.time(),"test"))
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-n.cores <- 9
+n.cores <- 8
 main.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -170,7 +172,7 @@ foreach::getDoParRegistered()
 #how many workers are available? (optional)
 foreach::getDoParWorkers()
 
-dir_now <- paste0("~/Git/S_land_bio_sim/Experiment_variation_500/Data_test_v2_var_",var)
+dir_now <- paste0("~/Git projects/S_land_bio_sim/exp/Experiment_Variation_",var)
 
 dir.create(dir_now)
 setwd(paste0(dir_now,"/"))
@@ -223,7 +225,7 @@ foreach(
 #### Kill the cluster
 parallel::stopCluster(cl = main.cluster)
 
-setwd("~/Git/S_land_bio_sim")
+setwd("~/Git projects/S_land_bio_sim")
 
 
 
@@ -244,7 +246,7 @@ print(paste("Start of Sim generation @",Sys.time(),"test"))
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-n.cores <- 9
+n.cores <- 8
 main.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -263,7 +265,7 @@ foreach::getDoParRegistered()
 #how many workers are available? (optional)
 foreach::getDoParWorkers()
 
-dir_now <- paste0("~/Git/S_land_bio_sim/Experiment_variation_500/Data_test_v2_var_",var)
+dir_now <- paste0("~/Git projects/S_land_bio_sim/exp/Experiment_Variation_",var)
 
 dir.create(dir_now)
 setwd(paste0(dir_now,"/"))
@@ -316,7 +318,7 @@ foreach(
 #### Kill the cluster
 parallel::stopCluster(cl = main.cluster)
 
-setwd("~/Git/S_land_bio_sim")
+setwd("~/Git projects/S_land_bio_sim")
 
 
 
@@ -338,7 +340,7 @@ print(paste("Start of Sim generation @",Sys.time(),"test"))
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-n.cores <- 9
+n.cores <- 8
 main.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -357,7 +359,7 @@ foreach::getDoParRegistered()
 #how many workers are available? (optional)
 foreach::getDoParWorkers()
 
-dir_now <- paste0("~/Git/S_land_bio_sim/Experiment_variation_500/Data_test_v2_var_",var)
+dir_now <- paste0("~/Git projects/S_land_bio_sim/exp/Experiment_Variation_",var)
 
 dir.create(dir_now)
 setwd(paste0(dir_now,"/"))
@@ -410,7 +412,7 @@ foreach(
 #### Kill the cluster
 parallel::stopCluster(cl = main.cluster)
 
-setwd("~/Git/S_land_bio_sim")
+setwd("~/Git projects/S_land_bio_sim")
 
 
 
@@ -431,7 +433,7 @@ print(paste("Start of Sim generation @",Sys.time(),"test"))
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-n.cores <- 9
+n.cores <- 8
 main.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -450,7 +452,7 @@ foreach::getDoParRegistered()
 #how many workers are available? (optional)
 foreach::getDoParWorkers()
 
-dir_now <- paste0("~/Git/S_land_bio_sim/Experiment_variation_500/Data_test_v2_var_",var)
+dir_now <- paste0("~/Git projects/S_land_bio_sim/exp/Experiment_Variation_",var)
 
 dir.create(dir_now)
 setwd(paste0(dir_now,"/"))
@@ -503,7 +505,7 @@ foreach(
 #### Kill the cluster
 parallel::stopCluster(cl = main.cluster)
 
-setwd("~/Git/S_land_bio_sim")
+setwd("~/Git projects/S_land_bio_sim")
 
 
 print(paste("Start of Sim generation @",Sys.time(),"test"))
@@ -523,7 +525,7 @@ print(paste("Start of Sim generation @",Sys.time(),"test"))
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-n.cores <- 9
+n.cores <- 8
 main.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -542,7 +544,7 @@ foreach::getDoParRegistered()
 #how many workers are available? (optional)
 foreach::getDoParWorkers()
 
-dir_now <- paste0("~/Git/S_land_bio_sim/Experiment_variation_500/Data_test_v2_var_",var)
+dir_now <- paste0("~/Git projects/S_land_bio_sim/exp/Experiment_Variation_",var)
 
 dir.create(dir_now)
 setwd(paste0(dir_now,"/"))
@@ -595,7 +597,7 @@ foreach(
 #### Kill the cluster
 parallel::stopCluster(cl = main.cluster)
 
-setwd("~/Git/S_land_bio_sim")
+setwd("~/Git projects/S_land_bio_sim")
 #### Loop to run replicates of simulations in individual folders ####
 # for (rep in 1:reps) {
 #   print(paste("Replicate #",rep))
@@ -726,7 +728,7 @@ foreach(
 
 print(paste("End of Sim generation @",Sys.time()))
 
-setwd("~/Git/S_land_bio_sim")
+setwd("~/Git projects/S_land_bio_sim")
 
 
 reps= 20
@@ -786,7 +788,7 @@ foreach(
 
 print(paste("End of Sim generation @",Sys.time()))
 
-setwd("~/Git/S_land_bio_sim")
+setwd("~/Git projects/S_land_bio_sim")
 
 
 reps= 20
@@ -847,7 +849,7 @@ foreach(
 print(paste("End of Sim generation @",Sys.time()))
 
 
-setwd("~/Git/S_land_bio_sim")
+setwd("~/Git projects/S_land_bio_sim")
 
 
 reps= 20
@@ -907,7 +909,7 @@ foreach(
 
 print(paste("End of Sim generation @",Sys.time()))
 
-setwd("~/Git/S_land_bio_sim")
+setwd("~/Git projects/S_land_bio_sim")
 
 
 reps= 20
