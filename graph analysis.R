@@ -128,7 +128,7 @@ Generate_CI_Graph <- function(S_year =1991) {
       labs(title = "Coverage of Confidence Intervals
 GAM VS OGmap VS STRAP", x="Year (simulation #)", y="Biomass in kg")+
       theme(plot.title = element_text(hjust = 0.5)) +
-      scale_y_continuous(limits = c(80000, NA), expand = c(0,0))
+      scale_y_continuous(limits = c(95000, NA), expand = c(0,0))
     
     colors2 <- c("STRAP" = "orange", "Total Biomass" = "black")
     
@@ -144,12 +144,12 @@ GAM VS OGmap VS STRAP", x="Year (simulation #)", y="Biomass in kg")+
       labs(title = "Coverage of Confidence Intervals
        STRAP", x="Year (simulation #)", y="Biomass in kg")+
       theme(plot.title = element_text(hjust = 0.5)) +
-      scale_y_continuous(limits = c(80000, NA), expand = c(0,0))
+      scale_y_continuous(limits = c(95000, NA), expand = c(0,0))
     
     CI_plot <- grid.arrange(CI_plot_gam_ogmap,CI_plot_Strap)
     
     
-    plot_name <- paste0(basename(getwd()),"_graph")
+    plot_name <- paste0(basename(getwd()),"_graph.png")
     
     ggsave(plot_name,
             plot = CI_plot,
@@ -222,7 +222,66 @@ CI_calc_percent <- function(S_year =1991) {
   
   CI_results <- data.frame(percentage_of_true_Ogmap=percentage_of_true_Ogmap,percentage_of_true_GAM=percentage_of_true_GAM,percentage_of_true_STRAP=percentage_of_true_STRAP)
   write_parquet(CI_results,"CI_results")
+}
+
+# 3. Generate Graph CI interval vs variation
+Generate_CI_Graph_vs_Var <- function(f_names=f_list) {
+  
+  CI_results_list <- list()
+  counter=1
+  
+  for (folder in f_names) {
+    CI_results_list[[counter]] <- read_parquet(paste0(folder,"/CI_results"))
+    counter=counter+1
   }
+  
+  CI_results_df <-  do.call(rbind.data.frame, CI_results_list)
+  
+  f_names <- sub("^.*Experiment_", "", f_names)
+  print(f_names)
+  
+  rownames(CI_results_df) <- f_names
+  
+  # Define desired order of row names
+  desired_order <- c("Variation_1", "Variation_5", "Variation_10", "Variation_25")
+  
+  # Create factor with desired order
+  row_order <- factor(rownames(CI_results_df), levels = desired_order)
+  
+  # Sort dataframe by factor
+  CI_results_df <- CI_results_df[order(row_order),]
+  
+  # Extract numeric portion of row names
+  variation <- as.numeric(gsub("Variation_", "", rownames(CI_results_df)))
+  
+  # Add variation column to dataframe
+  CI_results_df$variation <- variation
+  
+  library(ggplot2)
+  
+  # Define plot data
+  plot_data <- data.frame(
+    variation = CI_results_df$variation,
+    Ogmap = CI_results_df$percentage_of_true_Ogmap,
+    GAM = CI_results_df$percentage_of_true_GAM,
+    STRAP = CI_results_df$percentage_of_true_STRAP
+  )
+  
+  # Create ggplot with percentage of true values as a function of variation, with lines between points and title
+  ggplot(plot_data, aes(x = variation)) +
+    geom_line(aes(y = Ogmap, color = "Ogmap")) +
+    geom_point(aes(y = Ogmap, color = "Ogmap"), size = 3) +
+    geom_line(aes(y = GAM, color = "GAM")) +
+    geom_point(aes(y = GAM, color = "GAM"), size = 3) +
+    geom_line(aes(y = STRAP, color = "STRAP")) +
+    geom_point(aes(y = STRAP, color = "STRAP"), size = 3) +
+    scale_color_manual(values = c("Ogmap" = "red", "GAM" = "green", "STRAP" = "blue")) +
+    labs(x = "Variation", y = "Percentage of true values", 
+         title = "Percentage of the time the Confidence interval of models 
+         captures the true Biomass at different level of Landscape Variation")
+  
+  }
+
 
 
 
