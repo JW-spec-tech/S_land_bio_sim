@@ -154,7 +154,7 @@ GAM VS OGmap VS STRAP", x="Year (simulation #)", y="Biomass in kg")+
     ggsave(plot_name,
             plot = CI_plot,
             device = "png",
-            width = 24000,
+            width = 3000,
             height = 1835,
             units = "px",
             limitsize = F)
@@ -280,7 +280,100 @@ Generate_CI_Graph_vs_Var <- function(f_names=f_list) {
          title = "Percentage of the time the Confidence interval of models 
          captures the true Biomass at different level of Landscape Variation")
   
+}
+
+# 5. Generate SBI and RC vs variation
+
+Generate_CI_Graph_Surface_vs_CI <- function(f_names=f_list) {
+  
+  CI_results_list <- list()
+  counter=1
+  
+  for (folder in f_names) {
+    CI_results_list[[counter]] <- read_parquet(paste0(folder,"/CI_results"))
+    counter=counter+1
   }
+  
+  CI_results_df <-  do.call(rbind.data.frame, CI_results_list)
+  
+  f_names_col <- sub("^.*Experiment_", "", f_names)
+  print(f_names_col)
+  
+  
+  Surface_results_list <- list()
+  counter=1
+  
+  for (folder in f_names) {
+    Surface_results_list[[counter]] <- read.table(paste0(folder,"/Surface_roughness_mean"))
+    counter=counter+1
+  }
+  
+  Surface_results_df <-  do.call(cbind.data.frame, Surface_results_list)
+  
+  f_names_col <- sub("^.*Experiment_", "", f_names)
+  
+  colnames(Surface_results_df) <- f_names_col
+  
+  
+  # Extract the numbers from the column names
+  col_nums <- as.numeric(gsub("Variation_", "", colnames(Surface_results_df)))
+  
+  # Order the column numbers and get the corresponding column names
+  sorted_col_names <- colnames(Surface_results_df)[order(col_nums)]
+  
+  # Reorder the columns in the data frame using the sorted column names
+  Surface_results_df <- Surface_results_df[, sorted_col_names]
+  
+  # Transpose
+  Surface_results_df <- t(Surface_results_df)
+  
+  CI_results_df$RC <- Surface_results_df[,1]
+  
+  CI_results_df$SBI <- Surface_results_df[,2]
+  
+  CI_results_df$variation <- as.charCI_results_df$variation
+  
+  library(ggplot2)
+  library(gridExtra)
+  
+  # add row names as a column in the data frame
+  CI_results_df$name <- rownames(CI_results_df)
+  
+  # define the colors for each column
+  colours <- c("percentage_of_true_Ogmap" = "blue", "percentage_of_true_GAM" = "red", "percentage_of_true_STRAP" = "green")
+  
+
+  
+  # plot 1: percentage_of_true_Ogmap, percentage_of_true_GAM, and percentage_of_true_STRAP as a function of SBI
+  p1 <- ggplot(CI_results_df, aes(x = log10(SBI), group = factor(variation))) +
+    geom_point(aes(y = percentage_of_true_Ogmap, color = "Ogmap"), size = 3) +
+    geom_point(aes(y = percentage_of_true_GAM, color = "GAM"), size = 3) +
+    geom_point(aes(y = percentage_of_true_STRAP, color = "STRAP"), size = 3) +
+    labs(x = "log10(SBI)", y = "Percentage of True Biomass Captured") +
+    ggtitle("SBI vs. Percentage of True Biomass Captured") +
+    scale_color_manual(values = c("blue", "red", "green")) +
+    geom_text(aes(label = factor(variation), y = percentage_of_true_Ogmap),nudge_x = 0.006) +
+    geom_text(aes(label = factor(variation), y = percentage_of_true_GAM),nudge_x = 0.006) +
+    geom_text(aes(label = factor(variation), y = percentage_of_true_STRAP),nudge_x = 0.006)
+  
+  # plot 2: percentage_of_true_Ogmap, percentage_of_true_GAM, and percentage_of_true_STRAP as a function of log10(RC)
+  p2 <- ggplot(CI_results_df, aes(x = log10(RC), group = factor(variation))) +
+    geom_point(aes(y = percentage_of_true_Ogmap, color = "Ogmap"), size = 3) +
+    geom_point(aes(y = percentage_of_true_GAM, color = "GAM"), size = 3) +
+    geom_point(aes(y = percentage_of_true_STRAP, color = "STRAP"), size = 3) +
+    labs(x = "log10(RC)", y = "Percentage of True Biomass Captured") +
+    ggtitle("RC vs. Percentage of True Biomass Captured") +
+    scale_color_manual(values = c("blue", "red", "green")) +
+    geom_text(aes(label = factor(variation), y = percentage_of_true_Ogmap),nudge_x = 0.5) +
+    geom_text(aes(label = factor(variation), y = percentage_of_true_GAM),nudge_x = 0.5) +
+    geom_text(aes(label = factor(variation), y = percentage_of_true_STRAP),nudge_x = 0.5)
+  
+  # combine the two plots into one using grid.arrange
+  grid.arrange(p1, p2, ncol = 2)
+  
+  
+}
+
 
 
 
