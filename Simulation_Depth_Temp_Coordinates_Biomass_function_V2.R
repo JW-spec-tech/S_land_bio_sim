@@ -189,6 +189,7 @@ S_land_bio_sim <- function(c_wd=cwd,n,size,roughness=0.6,variation=1.5){
   sim<-list()
   stratum = values(patches_list$patches_raster)
   for (i in 1:n) {
+    year = 1990+i
     k=paste0("s_depth_DF",i)
     depth   = value  # get froim Main_L_COPY
     temp    = temps_sub[[k]][["fit"]]
@@ -196,7 +197,7 @@ S_land_bio_sim <- function(c_wd=cwd,n,size,roughness=0.6,variation=1.5){
     biomass = biomass_mean_sub[,i]
       #### NEEDS PATCH_RASTER CODE ABOVE ####
     name <- paste('item:',i,sep='')
-    tmp <- list(depth=depth, temp=temp, coord=coord, biomass=biomass,stratum=stratum)
+    tmp <- list(depth=depth, temp=temp, coord=coord, biomass=biomass,stratum=stratum,year=year)
     sim[[name]] <- as.data.frame(tmp)
   }
   
