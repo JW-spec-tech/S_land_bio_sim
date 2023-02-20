@@ -22,7 +22,7 @@ library(dplyr)
 #   install.packages(packages[!installed_packages])
 # }
 
-Size= 500 # Get size of Landscape
+Size= 499 # Get size of Landscape
 
 #### 1. Create and Start Cluster ####
 
@@ -30,7 +30,7 @@ Size= 500 # Get size of Landscape
 #create the cluster
 # n.cores <- parallelly::availableCores()/2   
 # For windows
-  n.cores <- 10
+  n.cores <- as.numeric(Sys.getenv('OMP_NUM_THREADS'))
   my.cluster <- parallel::makeCluster(
   n.cores, 
   type = "PSOCK"
@@ -60,7 +60,7 @@ getwd()
 replicates_gam <- function(S_year =1991) {
   
   start_year =S_year
-  years = files <-  20
+  years = files <-  200
   size = 499
   
 for (cwd in list.dirs(full.names = T,recursive = F)) {
@@ -196,7 +196,7 @@ Sys.time()
 
 # Get files names
   f_list <- paste0(getwd(),"/",list.dirs(path = "exp", full.names = TRUE, recursive = F))
-  
+  print(f_list)
 # Load sim data
 
 for (i in f_list) {
