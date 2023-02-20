@@ -1,4 +1,4 @@
-S_land_bio_sim <- function(c_wd=cwd,n,size,roughness=0.6,variation=1.5){
+S_land_bio_sim <- function(c_wd=cwd,n,size,roughness=0.6,variation=1){
   y=size
   x=size
 
@@ -77,6 +77,21 @@ S_land_bio_sim <- function(c_wd=cwd,n,size,roughness=0.6,variation=1.5){
     Sub_L_M[[i]]@data@values <- (Sub_L_M[[i]]@data@values*1126)+58
   }
   
+  # # Add patches of depth variation
+  # depth_patch_variation <- nlm_randomcluster(ncol = x-1, nrow = y-1,
+  #                                        p = 0.57,
+  #                                        ai = c(0.5, 0.25, 0.25))
+  # 
+  # depth_patch_variation_2 <- depth_patch_variation@data@values*depth_variation
+  # 
+  # # Multiply the landscape depth at every location
+  # for (i in 1:n) {
+  #   Sub_L_M[[i]]@data@values <- exp(depth_patch_variation_2)*Sub_L_M[[i]]@data@values
+  #   
+  # }
+  # 
+  # 
+  
   # #visualize
   # for(i in 1:n){
   # landscapetools::show_landscape(Sub_L_M[[i]])
@@ -142,10 +157,12 @@ S_land_bio_sim <- function(c_wd=cwd,n,size,roughness=0.6,variation=1.5){
   scale_temp<- dnorm(0,0,2)
   for (j in 1:n){
     k=paste0("s_depth_DF",j)
-    biomass_mean_sub[,j] <- (dnorm(((Sub_L_M[[j]]@data@values) - 312.5), 0, depth_sd)/scale_depth *dnorm(((temps_sub[[k]][["fit"]]) - 2.916), 0, temp_sd)/scale_temp) 
+    biomass_mean_sub[,j] <- (dnorm(((Sub_L_M[[j]]@data@values) - 312.5), 0, depth_sd)/scale_depth *dnorm(((temps_sub[[k]][["fit"]]) - 2.916), 0, temp_sd)/scale_temp) *2
   }
   
-  biomass_mean_sub
+  # biomass_mean_sub
+  
+  # sum(biomass_mean_sub[,4])
   
   message("5. Generate Biomass")
   
@@ -155,23 +172,37 @@ S_land_bio_sim <- function(c_wd=cwd,n,size,roughness=0.6,variation=1.5){
   biomass_variation <- nlm_randomcluster(ncol = x-1, nrow = y-1,
                                       p = 0.57,
                                       ai = c(0.5, 0.25, 0.25))
-  
-  biomass_variation@data@values <- biomass_variation@data@values*variation
-  # biomass_variation <- nlm_gaussianfield(x,
-  #                                        y,
-  #                                        resolution = 1,
-  #                                        autocorr_range = 100*10^variation,
-  #                                        mag_var = 50,
-  #                                        nug = 0.2,
-  #                                        mean = 0.5)
-  # 
+
+  biomass_variation@data@values <- exp(biomass_variation@data@values)*1.5
   
   # Multiply the landscape with mean biomass at every location
   for (i in 1:n) {
-    biomass_mean_sub[,i] <- exp(biomass_variation@data@values)*biomass_mean_sub[,i]
     
+    # Calculate the sum of the original raster
+    original_sum <- sum(biomass_mean_sub[,i])
+    print(sum(biomass_mean_sub[,i] ))
+    print(max(biomass_mean_sub[,i]))
+    
+    # Scale the second raster so that its maximum value is equal to the maximum value of the first raster
+    raster2_scaled <- biomass_variation * max(biomass_mean_sub[,i]) / max(biomass_variation@data@values)
+    
+    # Multiply the two rasters together
+    new_raster <- biomass_mean_sub[,i] * raster2_scaled@data@values
+    
+    # Adjust the values of the resulting raster to ensure that its total sum is equal to the total sum of the first raster
+    new_sum <- sum(new_raster)
+    new_raster_adjusted <- new_raster * (original_sum / new_sum)
+    
+    # Increase the maximum values of the resulting raster
+    peak_factor <- variation
+    threshold <- 0.9 * max(new_raster_adjusted)
+    new_raster_adjusted[new_raster_adjusted > threshold] <- new_raster_adjusted[new_raster_adjusted > threshold] * peak_factor
+    biomass_mean_sub[,i] <- new_raster_adjusted
+    
+    print(sum(biomass_mean_sub[,i] ))
+    print(max(biomass_mean_sub[,i]))
   }
-   
+  
   message("6. Add Variation in shrimp biomass")
   #### 7. Generate stratums
   patches_list <- make_patches(patch=Main_L_copy)
