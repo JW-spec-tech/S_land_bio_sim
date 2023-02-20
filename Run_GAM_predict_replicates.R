@@ -200,10 +200,11 @@ Sys.time()
 # Load sim data
 
 for (i in f_list) {
+  main <- getwd()
   print(i)
   setwd(i)
   replicates_gam()
-  setwd("~/Git projects/S_land_bio_sim")
+  setwd(main)
 }
 
 print(paste("End of Replicates @",Sys.time()))
