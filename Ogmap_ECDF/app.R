@@ -32,7 +32,7 @@ server <- function(input, output) {
   # Create data frame for quadratic equation with sin
   quadratic_eqn <- reactive({
     x <- seq(-10, 10, by = 1)
-    y <- input$a * x^2 + input$b * x + input$c + input$amp * sin(x)
+    y <- input$a * x^2 + input$b * x + input$c + input$amp * sin(x) *10
     data.frame(x = x, y = y)
   })
   
