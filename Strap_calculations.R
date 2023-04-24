@@ -36,22 +36,17 @@ Survey_W_Area <- dplyr::left_join(survey_raw_data,strata_area)
 
 #### 2. Run strap calculation ####
 Strap_estimate <- Survey_W_Area %>%
-  
-  dplyr::group_by(year,stratum)%>%
-  
-  dplyr::mutate(biomass=biomass/1000) %>% 
-  
-  dplyr::summarize(Bj = patch_area*mean(biomass),
-            s2j = (patch_area^2)*var(biomass)/(n())) %>% 
-  
-  distinct(year, stratum, .keep_all = TRUE) %>% 
-  
-  dplyr::group_by(year)%>%
-  
-  dplyr::summarize(B_total = sum(Bj),B_se= sqrt(sum(s2j))) %>%
-  
+  dplyr::group_by(year, stratum) %>%
+  dplyr::mutate(biomass = biomass / 1000) %>%
+  dplyr::filter(!is.na(patch_area) & !is.na(biomass)) %>% # filter out missing values
+  dplyr::summarize(Bj = patch_area * mean(biomass),
+                   s2j = (patch_area^2) * var(biomass) / (n())) %>%
+  distinct(year, stratum, .keep_all = TRUE) %>%
+  dplyr::group_by(year) %>%
+  dplyr::summarize(B_total = sum(Bj), B_se = sqrt(sum(s2j))) %>%
   dplyr::mutate(lower = B_total - 1.96*B_se,
-         upper = B_total + 1.96*B_se)
+                upper = B_total + 1.96*B_se)
+
 
 
 #### 4. Save the data ####
