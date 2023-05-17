@@ -170,17 +170,23 @@ message("2. Create Depth patches")
 
 
 #### 7. Plotting ####
-  
   library(ggplot2)
   library(viridis)
   library(cowplot)
   
   # Function to create stacked plot for each data frame and variable
   create_stacked_plot <- function(df, variable, title) {
+    mean_value <- mean(df[[variable]]) # Calculate the mean value
+    sum_value <- sum(df[["biomass"]]) # Calculate the sum of biomass
+    
     plot <- ggplot(df, aes(x = x, y = y, fill = .data[[variable]])) +
       geom_tile() +
       scale_fill_viridis() +
-      labs(title = title)
+      labs(title = title) +
+      annotate("text", x = Inf, y = Inf, label = paste("Mean:", round(mean_value, 2)), 
+               hjust = 1, vjust = 1, size = 4, color = "black") + # Add mean value as annotation
+      annotate("text", x = Inf, y = -Inf, label = paste("Sum:", round(sum_value, 2)), 
+               hjust = 1, vjust = 0, size = 4, color = "black") # Add sum of biomass as annotation
     
     return(plot)
   }
@@ -209,6 +215,8 @@ message("2. Create Depth patches")
   # Display the grid plot
   print(grid_plot)
   
+
+
   
   
   
