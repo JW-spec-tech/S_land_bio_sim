@@ -107,13 +107,61 @@ combined_plot
 message("2. Create Depth patches")
 
  # Add patches of depth variation
- depth_patch_variation <- nlm_randomcluster(ncol = 500, nrow = 500,
-                                        p = 0.40,
+ depth_patch_variation <- nlm_randomcluster(ncol = size-1, nrow = size-1,
+                                        p = 0.54,
                                         ai = c(0.7, 0.10, 0.10, 0.10))
  
   plot(depth_patch_variation)
+  
  # Multiply the landscape depth at every location
- for (i in 1:n) {
-   Sub_L_M[[i]]@data@values <- exp(depth_patch_variation_2)*Sub_L_M[[i]]@data@values
+  Sub_L_M_patch_v1 <- exp(depth_patch_variation*v1)*Sub_L_M[[1]]@data@values
+  Sub_L_M_patch_v1@data@values <- Sub_L_M_patch_v1@data@values/max(Sub_L_M_patch_v1@data@values)
+  Sub_L_M_patch_v2 <- exp(depth_patch_variation*v2)*Sub_L_M[[1]]@data@values
+  Sub_L_M_patch_v2@data@values <- Sub_L_M_patch_v2@data@values/max(Sub_L_M_patch_v2@data@values)
+  Sub_L_M_patch_v3 <- exp(depth_patch_variation*v3)*Sub_L_M[[1]]@data@values
+  Sub_L_M_patch_v3@data@values <- Sub_L_M_patch_v3@data@values/max(Sub_L_M_patch_v3@data@values)
+  
+#### 3. Generate depth ####
+  
+  Sub_L_M_patch_v1@data@values <- (Sub_L_M_patch_v1@data@values*1126)+58
+  Sub_L_M_patch_v2@data@values <- (Sub_L_M_patch_v2@data@values*1126)+58
+  Sub_L_M_patch_v3@data@values <- (Sub_L_M_patch_v3@data@values*1126)+58
 
- }
+  Sub_L_M_patch_v1_df <- as.data.frame(Sub_L_M_patch_v1, xy = TRUE)
+  Sub_L_M_patch_v2_df <- as.data.frame(Sub_L_M_patch_v2, xy = TRUE)
+  Sub_L_M_patch_v3_df <- as.data.frame(Sub_L_M_patch_v3, xy = TRUE)
+  
+  # Rename the 3rd column
+  names(Sub_L_M_patch_v1_df)[3] <- "depth"
+  names(Sub_L_M_patch_v2_df)[3] <- "depth"
+  names(Sub_L_M_patch_v3_df)[3] <- "depth"
+  
+#### 4. Generate Temperature ####
+  
+  message("4. Generate Temperature")
+  
+  real <- read.csv("/trawl_nl.csv")
+
+  # Generate gam based on real depth and temp
+  gam_depth_sim <- gam(temp_bottom ~ s(sqrt(depth), bs="ad"), data = real)
+
+  
+  # Predict the temperature from depth
+  Sub_L_M_patch_v1_df$temperature <- predict(gam_depth_sim, newdata = Sub_L_M_patch_v1_df, se.fit = T)
+  Sub_L_M_patch_v2_df$temperature <- predict(gam_depth_sim, newdata = Sub_L_M_patch_v2_df, se.fit = T)
+  Sub_L_M_patch_v3_df$temperature <- predict(gam_depth_sim, newdata = Sub_L_M_patch_v3_df, se.fit = T)
+
+#### 5. Generate Biomass ####
+  
+  message("5. Generate Biomass")
+  
+  # Biomass parameters #
+  depth_sd = 200
+  temp_sd  = 2
+  scale_depth <- dnorm(0,0,depth_sd)
+  scale_temp  <- dnorm(0,0,2)
+  
+  Sub_L_M_patch_v1_df$biomass <- dnorm((Sub_L_M_patch_v1_df$depth - 312.5), 0, 100)/dnorm(0,0,100)*dnorm((Sub_L_M_patch_v1_df$temperature[["fit"]] - 2.916), 0, 2)/dnorm(0,0,2)
+  Sub_L_M_patch_v2_df$biomass <- dnorm((Sub_L_M_patch_v1_df$depth - 312.5), 0, 100)/dnorm(0,0,100)*dnorm((Sub_L_M_patch_v1_df$temperature[["fit"]] - 2.916), 0, 2)/dnorm(0,0,2)
+  Sub_L_M_patch_v3_df$biomass <- dnorm((Sub_L_M_patch_v1_df$depth - 312.5), 0, 100)/dnorm(0,0,100)*dnorm((Sub_L_M_patch_v1_df$temperature[["fit"]] - 2.916), 0, 2)/dnorm(0,0,2)
+  
