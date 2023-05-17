@@ -38,7 +38,7 @@ source(file = "Make_PB_fall.dat.R")
 #### Set Simulation Parameters ####
 
 # Landscape dimensions
-x=y=size <- 100
+x=y=size <- 500
 
 # Number of years/simulations
 n <- 1
