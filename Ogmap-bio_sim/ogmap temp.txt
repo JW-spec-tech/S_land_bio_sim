@@ -1,0 +1,294 @@
+Ogive mapping
+Geoffrey Evans
+Department of Fisheries and Oceans St. John’s, Newfoundland
+Geoff.Evans@dfo-mpo.gc.ca (709)772-2090
+Abstract
+Define a probability field as an assigment (rule for assigning; function that assigns) a cumulative probability distribution for a random variabley to any point x in some domain; and
+define a survey {(yi, xi)} as a collection of independent random samples of y at assorted
+values of x from such a field. For any x, let ¯ y(x) = P yiwi/ P wi be a kernel regression point
+estimate of y(x), where wi = w(x − xi) ≥ 0. Then there is a basis cumulative probability
+function G(y) such that replacing yi by G(y − yi) in the kernel point estimate yields an
+estimate of the probability field.
+Given such an estimate, one can test whether it is consistent with the survey: whether
+the survey observations could plausibly be independent random samples from the field. Such
+a test can be used, for example, to choose an acceptable bandwidth of the kernel function
+w(x).
+Given a survey, it is of interest to consider the range of probability fields that could
+have generated it. Because we have the cdf at each survey node, we can simulate multiple
+resamples from it and use Monte Carlo methods (generalization of bootstrap). In particular,
+given a statistic (univariate function) of a field, we can form the basic bootstrap confidence
+conjecture: If a resampled statistic differs from the sample statistic ‘by this much’, then the
+sample statistic could as plausibly differ from the true statistic that generated it ‘by this
+much’. The definition of ‘by this much’ can be chosen to suit the situation.
+RFI, RFE paragraphs indicate room for improvement or exploration.
+1 Ecological introduction
+Marine ecology and fisheries present many examples of a probability field, in which a random
+variable has, at each element (‘node’) of some domain, a probability distribution, which can
+be different at different nodes, and the mean of the distribution is not its only, or even its
+1most, interesting property; nor is it the only property that varies over the domain. For
+example: (1) Fisheries managers are concerned when recruitment to fish stocks decreases as
+the spawning stock approaches low levels; they should be even more concerned if in addition
+the coefficient of variation increased, leading to greater uncertainty in recruitment. (2) It is
+unusual for a fish larva to survive to become a recognizable small fish. It is of interest to
+know if the surviving larvae are simply unusually lucky, or if they are also unusually good
+in some sense: come mostly from the upper tail of some distribution of larval fitness. (3)
+From surveys of fish stocks, it can be useful to know not only the mean concentration at
+some location but also the probability of a commercially useful concentration there, and the
+degree to which a stock is aggregated in a small portion of the region surveyed. Moreover,
+the object being surveyed really is a probability distribution: the actual location of fish
+will doubtless have shifted by the time anyone can make use of the survey results; the best
+one can hope for is that the probability of finding a given concentration in a given place has
+shifted mjuch less if at all. In these examples, and many others, there are no trusted theories
+of what the form of the probability distribution, or the form of dependence on covariates,
+ought to be.
+This paper will describe a method for estimating a probability field from a survey, and
+investigate some of the issues that arise in practical applications. Not all the issues will
+be resolved; there is considerable food for further thought, and the ‘right’ answer to some
+issues will often depend on special circumstances. This is not a rigid method but a tool for
+thinking about data, respecting what we know both about the system being observed and
+the survey design. This report should be considered as the beginning of a conversation with
+the reader; it is best read when the reader has a specific potential use in mind.
+2 Mathematical introduction
+What is the probability distribution and how does it depend on covariates? How to estimate
+it from a set of independent random samples, lacking any trusted theory either of the form
+of the distribution or of the form of the dependence? How to recognize a bad estimate? How
+uncertain is the estimate?
+Turning the question around: Given a survey (a set of independent random observations
+at various covariates; the covariates may or may not have been selected at random, may or
+may not all be distinct), how to guess what else might have been observed, either there or
+2at other covariate values?
+Define a probability field as an assignment of (ability to assign; function that assigns) a
+probability distribution to any element of some domain.
+Things said at this introductory level are important principles that pervade any potential
+modifications.
+2.1 Construction
+A (cumulative) probability distribution, in turn, is a function that computes, for any potential value x, the probability that a random sample from the distribution will be at least
+as large as x; or, equivalently, a function that computes, for any probability p, the corresponding quantile (value that has a probability p of not being exceeded). Much work has
+been done on a subproblem: What is the mean value of the distribution and how does it
+depend on covariates? And most of this work can be carried over to suggest an answer to our
+question. Suppose we have a survey {yi, xi} of independent random samples y at covariates
+x, and a nonparametric regression estimate of the mean at some x, of the form ¯ y = P wiyi
+where wi ≥ 0 and P wi = 1. Then define a cumulative probability basis functionG(y)
+to be a non-negative, non-decreasing function of y such that G(y) + G(−y) ≡ 1. G describes a cumulative probabitly distribution of y whose mean is zero. The Heaviside function
+H(y) = 0 if y < 0, 12 if y = 0, 1 if y > 0 is a simple example. Then P wiG(y − yi)
+is a cumulative probability distribution whose mean is ¯ y.
+To establish a form of notation that will be convenient later, suppose we have a true
+probability field F0 and a survey S1 from it. The reasoning above, given a rule for computing
+weights, allows us to construct an estimated field F1. The procedure is called ogive mapping
+(ogmap for short), a term due to Scott Akenhead. As with real mapmaking, it emphasizes
+that we are concerned with what is really there, not with any thought of the form it ‘ought’
+to have.
+2.2 Correctness
+We started by assuming that that the survey observations are independent random samples
+from their respective probability distributions. Have we construted a field that the observations could plausibly be independent random samples from. That is, are the cumulative
+probabilities of the observed values in their respective distributions uniformly and indepen-
+3dently distributed on [0,1]? Answers to this question have the potential for rejecting some
+estimating fields or, more constuctively, restricting our choice of possible rules for computing
+the weights.
+2.3 Confidence
+Given that we have an estimate of the whole probability distribution at every node, in
+particular every survey node, resampling methods beckon. Given a survey, what is the range
+of probability fields that could plausibly have produced it? If this is the ‘real’ question,
+we can pose, and answer, a synthetic question: given a survey and the probability field
+synthesized from it, what is the range of surveys it could plausibly generate. Then we can
+make the basic bootstrap conjecture: there is a sense in which the answer to the real question
+is the inverse of the answer to the synthetic question.
+In symbols: given a field F1 or equivalently (under a particular choice of rule for choosing
+weights) a survey S1, we can sample it (as often as we like) at the design points of S1 to
+produce a resampled survey S2 and field F2 which will differ from F1. The conjecture is that
+if F1 generated F2, which differed from it ‘in this way’, then, just as plausibly, F1 could
+have been generated by F0, from which it differed ‘in this way’.
+Two immediate comments. First, this is only a conjecture: it may be false. Second, we
+have left unspecified what is meant by ‘this way’, and presumably the conjecture can be true
+for at most one meaning.
+RFE: convenience Ordinary least squares regression also offers an answer to the question:
+What is the probability distribution and how does it depend on covariates? One feature of
+the answer is the claim that the distribution around the mean value is constant over the
+whole field. If true, this is very convenient: every observation is equally informative about
+the distribution and we get maximum information about it.
+Unlike the previous considerations, this is not something one tries to create in devising
+rules to estimate the probability field; it is simply something one likes the field (the data?)
+to have. One feature of the simplest linear regression is that all obervations are (deemed to
+be) equally informative about the distribution around the mean value at any node. This gives
+maximum diversity and maximum information about the cdf at any node. Also, in resampling, it gives the maximum evenness of probability of sampling all nodes, and intuitively a
+4better sense of the field. One could make a case for choosing bandwidths to give the maximum
+characteristic diversity consistent with correctness.
+The parametric method of unweighted least squares regression ‘says’ that all observations
+are equally informative (not equally influential; but minimize unweighted sum of squared
+deviations) about the distribution around the mean value. This is a convenient property to
+aim for once correctness or plausibility has been amply satisfied, because it makes the cdf
+better determined. Transforming the data to allow large bandwidths (i.e. a transform that
+makes the observations deviations from some function of the guides) is a possible way to
+achieve this.
+3 Sample implementation
+Things said at this sample level are only that: examples of ways the principles can be made
+precise. Improvements and different approaches are possible and welcome.
+3.1 Construction
+In all applications to date, I choose G to be the Heaviside function H. This gives a stepfunction cumulative distribution, which greatly simplifies calculations at the expense of asking
+questions only about cumulative probability, not about probability density, and of being somewhat awkward for quantiles (em e.g. median).
+How to choose the weights wi? The basic intuition is that survey nodes closer to the
+target node are given higher weights. There is a vast literature on nonlinear regression, from
+which I shall extract one example that seems well adapted to the task of estimating a whole
+probability distribution rather than just the expected value. We need a distance function
+d(x, y) between nodes x and y. An obvious choice for scalar guides is d(x, y) = |x − y|/c
+where c is a scale factor. We then need a kernel function to describe precisely how weight
+decreases with increasing (scaled) distance. I often choose k(d) = 1/(1 + dh) where h is a
+shape factor, typically 3 but generally estimated. I refer to this as a subcauchy function: it has
+in general thinner tails than the (unnormalized) Cauchy distribution with h = 2. It has the
+convenient property that k(0) = 1 and k(1) = 12, so that the scale c is the separation at which
+the kernel falls to half its maximum value. When investigating other kernel functions I scale
+them to preserve this property. The reason for liking a larger k has to do with resampling.
+It makes the kernel flat near zero, giving a better chance for values other than the original
+5to be resampled.
+The variance of the estimated cdf has a bias corresponding to using 1/ P wi2 in place of
+the sample size in the standard, equally weighted formula. Ecologists will recognize Simpson’s diversity index here (or at least its ‘numbers equivalent’: see, e.g. Jost 2007), and we
+refer to the diversity or effective sample size of the cdf. High diversity need not mean good
+information: all survey nodes might be equally irrelevant to the target node.
+RFE At a target node far from all the survey nodes (if one insists on doing such foolish
+extrapolation), the subcauchy kernel values for all survey nodes tend to the same value (ratio
+tends to 1). This differs from a kernel with exponential falloff, where the relative weights
+are frozen at the value they had on the boundary of the survey, and from gaussian falloff
+where the weights tend to be dominated by the single closest survey node. Subcauchy weights
+are also less susceptible to numerical underflow. One might consider working in similarity,
+rather than distance, measures, so that a very large difference along one axis need not totally
+obliterate the influence of high similarity along another.
+The underlying idea is that a probability distribution at one node is like that at a nearby
+node. But this doesn’t directly mean that all nearby observations should be treated the same.
+If there is a cluster of observations in one direction, they give a good representation of a
+single cdf more than a representation of many independent ones; therefore there is a case
+for downweighting them relative to an isolated observation at the same distance in another
+direction (Cadigan and Chen). This is generally the preferred option, though it can be turned
+off to get the classic Nadaraya-Watson estimate which is more convenient in testing.
+3.2 Correctness
+To test for uniformly distributed probabilities I use a Kolmogorov-Smirnov test, with one
+modification. The most common deviations from uniformity are either too many probabilities
+near 0 and 1, if the bandwidth is too narrow (excess variance), or too many near 0.5 if it
+is somewhat too large (excess bias). To increase the power to detect these two patterns of
+deviation, I test for the deviation of |prob − 0.5| from the line 2x for 0 < x < 0.5.
+There is a problem, though. If the bandwidth is infinite then, basically because of edge
+effects, the probabilities will be strung out exactly on the 1-1 line. Hence the need to test also
+for independence. If the probabilities are independent, then the difference between probabilities at two different survey observations will be triangularly distributed on [-1, 1]. I test for
+6the deviation of |P1 −P2| from the line x(2−x) for 0 < x < 1. Deviations from this are most
+likely to be found at nearby pairs and so the test is restricted to them (using an observation
+in no more than one pair to assure independence). For a vector guide, the choice of nearby
+pairs is not obvious, but can be approximated by solving something close to but not exactly
+the travelling salesman problem. RFI There is also an issue of circularity: what counts as
+close will depend on the aspect ratio: the relative size of bandwidths along the different guide
+axes; and this relative size is one of the things we want to estimate.
+Tests: Cannot test for all departures from independence. K-S tests. Fold the probabilities
+around 0.5 because main causes of deviation are either too many or too few extreme values
+on both ends.
+Cumulative probability in what distribution function? On the face of it, it seems sensible
+to compute the probability of each survey observation in the distribution at that node determined by all the other observations (jackknifed). If the survey observation itself, presumably
+with the highest step size, were part of the distribution, its cumulative probability (assuming
+we take the Heaviside function to have value 0.5 at zero) would be pulled towards 0.5 and
+this would not lead to a uniform distribution of probabilities on [0,1]. On the other hand,
+using jackknifed probabilities means that the probability field that has been tested is not the
+one that will be used. For resampling purposes, the two distributions differ dramatically in
+the probability that the observation itself will be resampled for that node. Rather than try to
+decidewhich option is better, I choose the cost as the worse of the two possibilities and try to
+minimize that.
+RFE: double deletion One might argue that, for the probability difference of nearby pairs,
+use the distributions with both observations deleted. This has led to vastly different estimates
+between full and jackknifed, with the jackknifed estimating an unrealistically small distance
+scale.
+The ‘correct’ bandwidths are not solely a function of the probability field; they depend
+also on the survey design. Think of this as variance-bias tradeoff in other clothes: there
+need to be enough survey nodes close to a target node so that the next nearest point doesn’t
+dominate and make the cumulative probability of the observation (or its nearest neighbour in
+the jackknife treatment) nearly 0 or 1, but not so many that the estimate is distorted by any
+underlying signal.
+73.3 Confidence
+There are so many ways in which one probability field can differ from another, that the
+concept of ‘this way’ is almost imposible to quantify. It is much easier to ask the question
+not of the whole field but of a statistic (scalar-valued function) of the field. The bootstrap
+conjecture then becomes: if resampled statistic T2 differs from the sample statistic T1 ‘by this
+much’ then T1 can plausibly differ from the true statistic T0 by this much. An algebraic form
+can cover a wide (perhaps exhaustive?) range of measures of ‘this much’: if ϕ(T1)−ϕ(T2) =
+a then it is plausible that ϕ(T0) − ϕ(T1) = a and so CT0 = ϕ−1(2ϕ(T1) − ϕ(T2) is a
+plausible candidate for the true statistic of the field that might have generated the survey
+leading to T1. Forms of ϕ(x) that might be appropriate in different circumstances include
+x, log x, √x, logit(x). The latter could make sense if T is intrinsically bounded between 0
+and 1. A z transform of x, if the standard deviation of the statistic is known or easily
+approximated, has also been used (so-called Studentized bootstrap).
+Making this more explicit in the context of confidence bounds: the basic bootstrap confidence conjecture states that if there is a collection {CT0} of n sorted candidates, then for
+the ith of these P(T0 < CT0[i]) = i/(1 + n) (e.g. Davison & Hinkley). One can then do
+a second level of resampling from the resampled fields F2 and compute candidate statistics
+CT1 that can be compared with the known statistic T1 of F1, leading to the bouble bootstrap
+confidence conjecture, which replaces i/(1 + n) in the previous equation by the fraction of
+CT1s for which T1 < CT1[i].
+What we really want to know is what range of F0 or T0 is consistent with, could plausibly
+have produced, the sampled F1 or T1? A related but not identical question about confidence
+is often posed: what is the probability that a computed confidence bound exceeds the true
+value? This is a question that can be posed for a known F0 and a family of potential surveys
+{S1} of it. The answer is a lot easier to compute, and doesn’t require inventing assumptions
+about a simulated world of potential fields from which F0 is drawn. But the real question we
+want to ask is about a single given survey S1 and what it’s consistent with. Whereas all we
+would have done with the related question is to guess at one field.
+4 Applications
+Some simple applications of earlier versions of the method have been presented in .... Here
+I consider some more complicated examples, concentrating on some non-routine issues that
+8might arise and methods for thinking about them.
+4.1 Nucleic acids: construction and correctness
+This looks at some nucleic acid data from cod larvae described in Clemmesen et al. The
+interest is in the amount of RNA per DNA in a larva as one possible indicator of cell
+activity and hence larval condition or fitness. The figures are not (yet) in the manuscript,
+but are available as separate pdf files in the data writeup subdirectory (where they can be
+shown full-screen, zoomed, etc.) A scatter plot of RNA against DNA is presented in Figure
+show3.2 (top panel), together with the median and quartiles of the estimated probability field
+for a subcahchy shape function with parameter 3 and a linear distance scale of 2, chosen as
+intuitively reasonable. At a glance, there are perhaps too few points outside the interquartile
+range: this is more evident in the middle panel, which shows the probabilities of the survey
+observations in their respective full (green) and jackknifed (red) distributions. A difference is
+observable only at the largest DNA values, where observations are very sparse. The abscissa
+in the middle and lower panels is the rank order of DNA observations, so that the cluster of
+observations less than 5 micrograms DNA can be seen more clearly.
+The bottom panel plots the cumulative distribution of probabilities, with the same colour
+coding. The pair of lines rising more steeply display the absolute difference of the probabilities
+from 0.5 (test of uniformity); the pair rising more slowly display the absolute difference of
+pairs of probabilities at adjacent DNA values (test of independence). The pattern of too few
+extreme probabilities is confirmed once again by the ‘uniformity’ plot rising more steeply than
+the theory for U[0,1] observations (black dotted straight line), and it would also cause the
+excessive steepness of the ‘independence’ plot relative to the theorletical curve x(2 − x).
+Presented next are examples of extreme distance scales, either much too small (0.2; Fig
+show3.02) or much too large (20; Fig show.320). For a tiny scale the difference between full
+and jackknifed distributions is blatantly obvious in the middle panel. The full distribution
+would have a very large step at the observation itself which would pull the probability towards
+0.5; the jackknifed distribution would have a very large step at the next nearest observation,
+which would be either larger or smaller and would pull the probability of the obervation
+itself close to either 0 or 1 respectively. The uniformity lines in the bottom panel show the
+pull towards small differences from 0.5 in the full distribution and large differences in the
+jackknifed. Too many extreme probabilities lead to too many extreme differences in the red
+9independence line.
+For distance scale much too large, the uniformity lines look much too good, but this is an
+artefact of edge effects. A large distance scale effectively says that all the observations are
+identically distributed so that their cumulative probabilities are simply their rank order scaled
+to a maximum of 1. This is where the test for independence is essential, showing that when
+there is a real signal the cumulative probabilities of adjacent observations are close to equal
+and the independence line rises much too steeply.
+It will have occurred to you by now that the data set, with more than 1/3 of the points in
+the lowest 10% of the DNA range, is a very poor candidate for a local approach that assumes
+the distance scale, the measure of ‘localness’, is the same everywhere. Try to forget you know
+this while we examine different diagnostics.
+The next set of figures shows the result of optimizing the bandwidths (using Nikolaus
+Hansen’s covariance matrix adaptation evolution strategy). Unfortunately, things get tangly,
+with ever-more-deeply-nested levels of probabilities of probabilities. There are two things to
+get right: the uniformity and independence curves. If there are two things that are both
+supposed to be U[0,1], namely the probabilities of deviations from KS curves, then we can
+multiply the two and compute the area of the unit square that the isobar of the product would
+delimit. If the product is p this tuend out to be p(1 − log p).
+Figure show.fullopt seeks the best solution to the problem using the cumulative probability of the observed values in their respective full probability distributions. The estimated
+subcauchy shape and distance scale are [36.6, 1.06]: getting close to a rectangular shape function that is almost 1 just above the distance scale falls almost to zero just beyond it. The full
+uniformity line is almost spot-on while the jacknifed one rises too slowly; there is a visible
+difference between full and jackknifed points for a larger range of DNA values, including the
+gap in the data below 3 migrograms. The independence lines both seem reasonable.
+Figure show.jackopt is the corresponding for jackknifed distributions: bandwidths [2.949,
+0.679]. Although both parameters are smaller, there is very little visible difference in the
+quartile plots. The jackknifed uniformity line is spot-on and the jackknifed independence
+line is visibly better than the full one. But one would struggle to see the difference between
+full and jackknifed optimized results in the top or middle panels of their two figures. Figure
+show.worst comes from optmizing to minimze the worse of the two previous cost functions.
+With bandwidths [10.937, 1.336] it again looks very similar, with an intermediate estimated
+10shape parameter but (interestingly?) a large distance scale than either.
+4.2 Synthetic trawl surveys: confidence
+11
