@@ -9,6 +9,7 @@ library(rgeos)
 library(tidyr)
 library(readr)
 library(dplyr)
+library(units)
 library(mgcv)
 library(readr)
 library(foreach)
@@ -137,7 +138,7 @@ make_patches <- function(patch){ #,plot=F
 
 Make_patch_domain_arena_DAT <- function(size=sizes,patches,the_stack,percent){
   c_wd=getwd()
-   # Generating areas
+  # Generating areas
   
   patches_area <- patches %>% 
     dplyr::select(-bound_id) %>% 
@@ -280,12 +281,12 @@ Make_PB_fall.dat <- function(percent_f=0.025,path="PB_fall.dat.complete",fname="
   c_wd=getwd()
   F_data <- arrow::read_parquet(paste0(c_wd,"/","PB_fall.dat.complete"))
   
-  propotion_strata <- df %>%
+  propotion_strata <- F_data %>%
     dplyr::group_by(stratum, year) %>%
     dplyr::summarize(n = n()) %>%
     dplyr::mutate(prop = round(ifelse(n * percent_f <= 3, 3, n * percent_f)))
   
-  S_data <- df %>%
+  S_data <- F_data %>%
     dplyr::left_join(propotion_strata, by = c("stratum", "year")) %>%
     dplyr::group_by(stratum, year) %>%
     dplyr::group_split() %>%
@@ -370,7 +371,7 @@ s_land_bio_sim_V2 <- function(size=size.,n=n.,roughness=roughness.,V=V.) {
   
   
   for(i in 1:n){
-    Sub_L_M[[i]] <- (exp(depth_patch_variation*v1))*Sub_L_M[[i]]@data@values
+    Sub_L_M[[i]] <- (exp(depth_patch_variation*V))*Sub_L_M[[i]]@data@values
   }
   
   
@@ -465,12 +466,17 @@ s_land_bio_sim_V2 <- function(size=size.,n=n.,roughness=roughness.,V=V.) {
 }
 
 
-# Define the STRAP function
+# Function: STRAP
+# Purpose: Perform the STRAP estimation
+# Inputs: fname - Filename for the STRAP estimate
+#         c_wd - Current working directory
+# Outputs: STRAP estimate saved as a Parquet file
+
 STRAP <- function(fname = "Strap_estimate") {
   c_wd <- getwd()
   
-  # 1. Load data
-  F_data <- read_parquet(paste0(c_wd, "/PB_fall.dat.complete"))
+  # Load data
+  F_data <- arrow::read_parquet(paste0(c_wd, "/PB_fall.dat.complete"))
   
   # Calculate biomass by year
   biomass_year <- F_data %>%
@@ -497,12 +503,12 @@ STRAP <- function(fname = "Strap_estimate") {
     dplyr::mutate(biomass = biomass / 1000) %>%
     dplyr::filter(!is.na(patch_area) & !is.na(biomass)) %>% # filter out missing values
     dplyr::summarize(Bj = patch_area * mean(biomass),
-              s2j = (patch_area^2) * var(biomass) / (n())) %>%
+                     s2j = (patch_area^2) * var(biomass) / (n())) %>%
     dplyr::distinct(year, stratum, .keep_all = TRUE) %>%
     dplyr::group_by(year) %>%
     dplyr::summarize(B_total = sum(Bj), B_se = sqrt(sum(s2j))) %>%
     dplyr::mutate(lower = B_total - 1.96 * B_se,
-           upper = B_total + 1.96 * B_se)
+                  upper = B_total + 1.96 * B_se)
   
   # 4. Save the data
   # Join the data
@@ -532,6 +538,7 @@ n. <- as.numeric(Sys.getenv('YEARS')) # 200
 
 # Vairation
 V. <- as.numeric(Sys.getenv('VARIATION')) # 1
+
 
 # Number of Replicates
 reps <- as.numeric(Sys.getenv('REPS')) # 150
@@ -570,44 +577,42 @@ foreach::getDoParWorkers()
 
 print(getwd())
 
+# Store the main directory before the loop
+main_dir <- getwd()
+
 foreach(
   rep = 1:reps,
-  .packages = c('mgcv','dplyr','purrr','NLMR','arrow','sspm','raster','foreach','doParallel','parallelly','readr','fasterize')
+  .packages = c('mgcv','dplyr','purrr','NLMR','arrow','sspm','raster','foreach','doParallel','parallelly','readr','fasterize','units')
 ) %dopar% {
-  print(paste("Replicate #",rep))
-  seeds = seed - 1 + rep
+  print(paste("Replicate #", rep))
+  seeds <- seed - 1 + rep
   set.seed(seeds)
-  cwd <- cwd.          # MAIN dir
-  newdir <- paste("Run",rep,"Size",size.,"seed",seeds,"nsim",n.,"Percent",percent.,Sys.Date(),sep = "_")
+  newdir <- paste("Run", rep, "Size", size., "seed", seeds, "nsim", n., "Percent", percent., Sys.Date(), sep = "_")
   dir.create(newdir)     # Create new directory
   setwd(newdir) 
-  write.table(as.data.frame(newdir),"seed")
+  write.table(as.data.frame(newdir), "seed")
+  
   #### 1. Run the sim ####
   results <- s_land_bio_sim_V2()
   
   # Save size of each strata
-  patches=results$patches_list$patches
-  patches=st_set_geometry(patches,NULL)
-  write_parquet(patches,"patches")
+  patches <- results$patches_list$patches
+  patches <- st_set_geometry(patches, NULL)
+  write_parquet(patches, "patches")
   
   #### 2. Write the ogmap files ####
-  Make_patch_domain_arena_DAT(size=size.,patches=results$patches_list$patches,the_stack=results$the_stack,percent=percent.)
+  Make_patch_domain_arena_DAT(size = size., patches = results$patches_list$patches, the_stack = results$the_stack, percent = percent.)
   
   #### 3. Make Survey ####
-  
   Make_PB_fall.dat()
   
   #### 4. Run STRAP ####
   STRAP()
   
-  #### 6. Return to Original WD ####
-  setwd("..")
+  #### 6. Return to Main Directory ####
+  setwd(main_dir)  # Reset working directory to the main directory
   gc()
-  
-  
-  
 }
-
 
 #### Kill the cluster
 parallel::stopCluster(cl = main.cluster)
