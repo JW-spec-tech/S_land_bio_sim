@@ -1,0 +1,23 @@
+install.packages("https://cran.r-project.org/src/contrib/Archive/RandomFieldsUtils/RandomFieldsUtils_1.2.5.tar.gz", repos = NULL, type = "source")
+
+install.packages("sp")
+
+install.packages("https://cran.r-project.org/src/contrib/Archive/RandomFields/RandomFields_3.3.14.tar.gz", repos = NULL, type = "source")
+
+install.packages(c("checkmate", "dplyr", "raster", "spatstat.core", "spatstat.geom", "igraph", "fasterize", "sf", "Rcpp"))
+
+#### Install and Load necessary packages ####
+install_packages <- function(packages) {
+  for (package in packages) {
+    if (!requireNamespace(package, quietly = TRUE)) {
+      install.packages(package)
+    }
+    library(package, character.only = TRUE)
+  }
+}
+
+# Packages to install and load
+packages <- c("arrow", "NLMR", "sf", "raster", "fasterize", "sspm", "rgeos", "tidyr", "readr", "dplyr", "units", "mgcv",
+              "foreach", "doParallel", "parallelly", "ranger", "tidyverse", "kableExtra", "ggplot2", "patchwork", "viridis")
+
+install_packages(packages)
