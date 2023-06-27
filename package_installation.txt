@@ -29,5 +29,8 @@ install.packages("devtools")
 
 devtools::install_github("pedersen-fisheries-lab/sspm")
 
+install.packages("https://cran.r-project.org/src/contrib/Archive/NLMR/NLMR_1.1.tar.gz", repos = NULL, type = "source")
+
+
 
 
