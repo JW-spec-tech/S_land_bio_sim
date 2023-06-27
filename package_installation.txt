@@ -4,7 +4,10 @@ install.packages("sp")
 
 install.packages("https://cran.r-project.org/src/contrib/Archive/RandomFields/RandomFields_3.3.14.tar.gz", repos = NULL, type = "source")
 
-install.packages(c("checkmate", "dplyr", "raster", "spatstat.core", "spatstat.geom", "igraph", "fasterize", "sf", "Rcpp"))
+install.packages(c("checkmate", "dplyr", "raster", "spatstat.geom", "igraph", "fasterize", "sf", "Rcpp"))
+install.packages(c("spatstat.random", "spatstat.sparse", "abind", "tensor", "goftest"))
+
+install.packages("https://cran.r-project.org/src/contrib/Archive/spatstat.core/spatstat.core_2.4-4.tar.gz", repos = NULL, type = "source")
 
 #### Install and Load necessary packages ####
 install_packages <- function(packages) {
@@ -17,7 +20,14 @@ install_packages <- function(packages) {
 }
 
 # Packages to install and load
-packages <- c("arrow", "NLMR", "sf", "raster", "fasterize", "sspm", "rgeos", "tidyr", "readr", "dplyr", "units", "mgcv",
+packages <- c("arrow", "sf", "raster", "fasterize", "rgeos", "tidyr", "readr", "dplyr", "units", "mgcv",
               "foreach", "doParallel", "parallelly", "ranger", "tidyverse", "kableExtra", "ggplot2", "patchwork", "viridis")
 
 install_packages(packages)
+
+install.packages("devtools")
+
+devtools::install_github("pedersen-fisheries-lab/sspm")
+
+
+
